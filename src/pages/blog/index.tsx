@@ -1,13 +1,9 @@
 import React from 'react'
-import logo from "assets/ldx.png"
-import Image from "next/image";
 
-function index() {
+function Blog() {
   return (
-    <div>
-      <Image src={logo} />
-    </div>
-  );
+    <div>index</div>
+  )
 }
 
-export default index
+export default Blog;
