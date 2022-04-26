@@ -1,0 +1,13 @@
+{
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true
+	},
+	"[typescript]": {
+		"editor.formatOnSave": true
+	},
+	"eslint.codeAction.showDocumentation": {
+		"enable": true
+	},
+	"editor.formatOnSave": true,
+	"deepscan.enable": true
+}
