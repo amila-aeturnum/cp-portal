@@ -22,10 +22,10 @@ declare module '@mui/material/styles' {
 
 export const theme = createTheme({
 	primary: {
-		main: '#000'
+		main: '#00000'
 	},
 	secondary: {
-		main: '#000'
+		main: '#352B61'
 	},
 	palette: {
 		mode: 'light'
