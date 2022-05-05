@@ -16,7 +16,6 @@ import { Drawer, DrawerHeader } from './Drawer';
 import { useRouter } from 'next/router';
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useEffect } from 'react';
-import { loginRequest } from 'configs/azureConfig';
 import { get } from 'lodash-es';
 import Loader from 'components/atoms/Loader';
 
@@ -49,13 +48,15 @@ export default function Layout(props: ILayout) {
 	};
 
 	const handleLogin = async () => {
-		await instance.loginRedirect(loginRequest).catch(() => {});
+		await instance.loginRedirect().catch(() => {});
 	};
 
-	const handleLogout = async () => {
-		await instance.logoutRedirect({
-			account: currentAccount
-		});
+	const handleLogout = () => {
+		instance
+			.logoutRedirect({
+				account: currentAccount
+			})
+			.then(() => handleLogin());
 	};
 	if (!isAuth) {
 		return <Loader />;
