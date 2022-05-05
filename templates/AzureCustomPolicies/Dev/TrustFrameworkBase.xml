@@ -291,6 +291,17 @@
         <UserInputType>TextBox</UserInputType>
       </ClaimType>
 
+      <ClaimType Id="jobTitle">
+        <DisplayName>Job Title</DisplayName>
+        <DataType>string</DataType>
+        <DefaultPartnerClaimTypes>
+          <Protocol Name="OAuth2" PartnerClaimType="jobTitle" />
+          <Protocol Name="OpenIdConnect" PartnerClaimType="jobTitle" />
+          <Protocol Name="SAML2" PartnerClaimType="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/jobtitle" />
+        </DefaultPartnerClaimTypes>
+      </ClaimType>
+
+
     </ClaimsSchema>
 
     <ClaimsTransformations>
@@ -594,6 +605,7 @@
             <OutputClaim ClaimTypeReferenceId="otherMails" />
             <OutputClaim ClaimTypeReferenceId="givenName" />
             <OutputClaim ClaimTypeReferenceId="surname" />
+            <OutputClaim ClaimTypeReferenceId="jobTitle" PartnerClaimType="jobTitle" />
           </OutputClaims>
           <IncludeTechnicalProfile ReferenceId="AAD-Common" />
         </TechnicalProfile>
