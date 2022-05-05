@@ -14,6 +14,11 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { ListItem, ListItemButton } from '@mui/material';
 import { Drawer, DrawerHeader } from './Drawer';
 import { useRouter } from 'next/router';
+import { useIsAuthenticated, useMsal } from '@azure/msal-react';
+import { useEffect } from 'react';
+import { loginRequest } from 'configs/azureConfig';
+import { get } from 'lodash-es';
+import Loader from 'components/atoms/Loader';
 
 interface ILayout {
 	children: React.ReactNode;
@@ -22,7 +27,18 @@ interface ILayout {
 export default function Layout(props: ILayout) {
 	const { children } = props;
 	const [open, setOpen] = React.useState(false);
+	const [isAuth, setIsAuth] = React.useState<boolean>();
 	const router = useRouter();
+	const { instance, accounts } = useMsal();
+	const isAuthenticated = useIsAuthenticated();
+	const currentAccount = accounts[0];
+
+	useEffect(() => {
+		if (!isAuthenticated) {
+			handleLogin();
+		}
+		setIsAuth(isAuthenticated);
+	}, [isAuthenticated]);
 
 	const handleDrawerOpen = () => {
 		setOpen(true);
@@ -32,90 +48,126 @@ export default function Layout(props: ILayout) {
 		setOpen(false);
 	};
 
-	return (
-		<Box sx={{ display: 'flex' }}>
-			<CssBaseline />
-			<Drawer variant="permanent" open={open}>
-				<DrawerHeader sx={{ height: 140 }}></DrawerHeader>
-				<Divider />
-				<List sx={{ overflowY: 'auto', overflowX: 'hidden', height: '40%' }}>
-					{['User Management', 'Global Query List', 'Customized Queries', 'Statistics'].map((text, index) => (
-						<ListItemButton
-							key={text}
-							sx={{
-								minHeight: 48,
-								justifyContent: open ? 'initial' : 'center',
-								px: 2.5
-							}}
-						>
-							<ListItemIcon
+	const handleLogin = async () => {
+		await instance.loginRedirect(loginRequest).catch(() => {});
+	};
+
+	const handleLogout = async () => {
+		await instance.logoutRedirect({
+			account: currentAccount
+		});
+	};
+	if (!isAuth) {
+		return <Loader />;
+	} else {
+		return (
+			<Box sx={{ display: 'flex' }}>
+				<CssBaseline />
+				<Drawer variant="permanent" open={open}>
+					<DrawerHeader sx={{ height: 140 }}></DrawerHeader>
+					<Divider />
+					<List sx={{ overflowY: 'auto', overflowX: 'hidden', height: '40%' }}>
+						{['User Management', 'Global Query List', 'Customized Queries', 'Statistics'].map((text, index) => (
+							<ListItemButton
+								key={text}
 								sx={{
-									minWidth: 0,
-									mr: open ? 3 : 'auto',
-									justifyContent: 'center'
+									minHeight: 48,
+									justifyContent: open ? 'initial' : 'center',
+									px: 2.5
 								}}
 							>
-								{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-							</ListItemIcon>
-							<ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-						</ListItemButton>
-					))}
-				</List>
-				<Divider />
-				<List sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
-					{['Notifications', 'Settings', 'Logout'].map((text, index) => (
-						<ListItemButton
-							key={text}
-							sx={{
-								minHeight: 48,
-								justifyContent: open ? 'initial' : 'center',
-								px: 2.5
-							}}
-							onClick={() => router.push('/user-management/clients')}
-						>
-							<ListItemIcon
-								sx={{
-									minWidth: 0,
-									mr: open ? 3 : 'auto',
-									justifyContent: 'center'
-								}}
-							>
-								{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-							</ListItemIcon>
-							<ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-						</ListItemButton>
-					))}
-				</List>
-				<div style={{ bottom: 10, position: 'fixed' }}>
-					<IconButton onClick={open ? handleDrawerClose : handleDrawerOpen}>
-						{!open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-					</IconButton>
-					<List>
-						<ListItem
-							sx={{
-								minHeight: 48,
-								justifyContent: open ? 'initial' : 'center',
-								px: 2.5,
-								bottom: 0
-							}}
-						>
-							<ListItemIcon
-								sx={{
-									minWidth: 0,
-									mr: open ? 3 : 'auto',
-									justifyContent: 'center'
-								}}
-							>
-								<AccountCircleIcon fontSize="medium" />
-							</ListItemIcon>
-							<ListItemText primary={'User'} secondary={'user@outlook.com'} sx={{ opacity: open ? 1 : 0 }} />
-						</ListItem>
+								<ListItemIcon
+									sx={{
+										minWidth: 0,
+										mr: open ? 3 : 'auto',
+										justifyContent: 'center'
+									}}
+								>
+									{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+								</ListItemIcon>
+								<ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+							</ListItemButton>
+						))}
 					</List>
-				</div>
-			</Drawer>
-			<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-				{children}
+					<Divider />
+					<List sx={{ overflowY: 'auto', overflowX: 'hidden' }}>
+						{['Notifications', 'Settings'].map((text, index) => (
+							<ListItemButton
+								key={text}
+								sx={{
+									minHeight: 48,
+									justifyContent: open ? 'initial' : 'center',
+									px: 2.5
+								}}
+								onClick={() => router.push('/user-management/clients')}
+							>
+								<ListItemIcon
+									sx={{
+										minWidth: 0,
+										mr: open ? 3 : 'auto',
+										justifyContent: 'center'
+									}}
+								>
+									{index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+								</ListItemIcon>
+								<ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+							</ListItemButton>
+						))}
+						<ListItemButton
+							sx={{
+								minHeight: 48,
+								justifyContent: open ? 'initial' : 'center',
+								px: 2.5
+							}}
+							onClick={handleLogout}
+						>
+							<ListItemIcon
+								sx={{
+									minWidth: 0,
+									mr: open ? 3 : 'auto',
+									justifyContent: 'center'
+								}}
+							>
+								<InboxIcon />
+							</ListItemIcon>
+							<ListItemText primary={'Logout'} sx={{ opacity: open ? 1 : 0 }} />
+						</ListItemButton>
+					</List>
+					<div style={{ bottom: 10, position: 'fixed' }}>
+						<IconButton onClick={open ? handleDrawerClose : handleDrawerOpen}>
+							{!open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+						</IconButton>
+						<List>
+							<ListItem
+								sx={{
+									minHeight: 48,
+									justifyContent: open ? 'initial' : 'center',
+									px: 2.5,
+									bottom: 0
+								}}
+							>
+								<ListItemIcon
+									sx={{
+										minWidth: 0,
+										mr: open ? 3 : 'auto',
+										justifyContent: 'center'
+									}}
+								>
+									<AccountCircleIcon fontSize="medium" />
+								</ListItemIcon>
+								<ListItemText
+									primary={get(currentAccount, 'idTokenClaims.name')}
+									secondary={'user@outlook.com'}
+									sx={{ opacity: open ? 1 : 0 }}
+								/>
+							</ListItem>
+						</List>
+					</div>
+				</Drawer>
+				<Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+					{children}
+				</Box>
 			</Box>
-		</Box>
-	);
+		);
+	}
 }

@@ -1,22 +1,9 @@
-import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { useEffect } from 'react';
 import styles from '../../styles/Home.module.css';
 
 const Home: NextPage = () => {
-	const { instance } = useMsal();
-	const isAuthenticated = useIsAuthenticated();
-
-	useEffect(() => {
-		if (!isAuthenticated && instance) {
-			setTimeout(() => {
-				instance.loginRedirect();
-			}, 1000);
-		}
-	}, [instance]);
-
 	return (
 		<div className={styles.container}>
 			<Head>
