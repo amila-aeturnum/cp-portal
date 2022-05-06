@@ -36,6 +36,7 @@ export default function Layout(props: ILayout) {
 
 	useEffect(() => {
 		setIsAuth(isAuthenticated);
+		console.log(currentAccount);
 	}, [isAuthenticated]);
 
 	const handleDrawerOpen = () => {
@@ -161,7 +162,7 @@ export default function Layout(props: ILayout) {
 								</ListItemIcon>
 								<ListItemText
 									primary={get(currentAccount, 'idTokenClaims.name')}
-									secondary={'user@outlook.com'}
+									secondary={get(currentAccount, 'idTokenClaims.email')}
 									sx={{ opacity: open ? 1 : 0 }}
 								/>
 							</ListItem>
