@@ -311,7 +311,7 @@
         <UserHelpText>Minimum 8 characters.</UserHelpText>
         <Parameters>
           <Parameter Id="Minimum">8</Parameter>
-          <Parameter Id="Maximum">64</Parameter>
+          <Parameter Id="Maximum">20</Parameter>
         </Parameters>
       </Predicate>
       <Predicate Id="Lowercase" Method="IncludesCharacters">
