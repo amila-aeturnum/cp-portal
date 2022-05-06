@@ -16,9 +16,10 @@ import { Drawer, DrawerHeader } from './Drawer';
 import { useRouter } from 'next/router';
 import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useEffect } from 'react';
-import { loginRequest } from 'configs/azureConfig';
 import { get } from 'lodash-es';
 import Loader from 'components/atoms/Loader';
+import Image from 'next/image';
+import logo from '../../../assets/app-logo.svg';
 
 interface ILayout {
 	children: React.ReactNode;
@@ -26,7 +27,7 @@ interface ILayout {
 
 export default function Layout(props: ILayout) {
 	const { children } = props;
-	const [open, setOpen] = React.useState(false);
+	const [open, setOpen] = React.useState(true);
 	const [isAuth, setIsAuth] = React.useState<boolean>();
 	const router = useRouter();
 	const { instance, accounts } = useMsal();
@@ -34,9 +35,6 @@ export default function Layout(props: ILayout) {
 	const currentAccount = accounts[0];
 
 	useEffect(() => {
-		if (!isAuthenticated) {
-			handleLogin();
-		}
 		setIsAuth(isAuthenticated);
 	}, [isAuthenticated]);
 
@@ -48,23 +46,29 @@ export default function Layout(props: ILayout) {
 		setOpen(false);
 	};
 
-	const handleLogin = async () => {
-		await instance.loginRedirect(loginRequest).catch(() => {});
-	};
-
-	const handleLogout = async () => {
-		await instance.logoutRedirect({
+	const handleLogout = () => {
+		instance.logoutRedirect({
 			account: currentAccount
 		});
 	};
+
 	if (!isAuth) {
-		return <Loader />;
+		return (
+			<>
+				<Loader />
+				{children}
+			</>
+		);
 	} else {
 		return (
 			<Box sx={{ display: 'flex' }}>
 				<CssBaseline />
 				<Drawer variant="permanent" open={open}>
-					<DrawerHeader sx={{ height: 140 }}></DrawerHeader>
+					<DrawerHeader sx={{ height: 140 }}>
+						<div style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto', width: '50%' }}>
+							<Image src={logo} width="100%" height="100%" alt="logo" />
+						</div>
+					</DrawerHeader>
 					<Divider />
 					<List sx={{ overflowY: 'auto', overflowX: 'hidden', height: '40%' }}>
 						{['User Management', 'Global Query List', 'Customized Queries', 'Statistics'].map((text, index) => (
@@ -75,6 +79,7 @@ export default function Layout(props: ILayout) {
 									justifyContent: open ? 'initial' : 'center',
 									px: 2.5
 								}}
+								onClick={() => router.push('/user-management/clients')}
 							>
 								<ListItemIcon
 									sx={{
@@ -99,7 +104,6 @@ export default function Layout(props: ILayout) {
 									justifyContent: open ? 'initial' : 'center',
 									px: 2.5
 								}}
-								onClick={() => router.push('/user-management/clients')}
 							>
 								<ListItemIcon
 									sx={{

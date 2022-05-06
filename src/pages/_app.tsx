@@ -6,9 +6,10 @@ import { theme } from 'configs/theme';
 import { Router } from 'next/router';
 import { useState } from 'react';
 import Loader from 'components/atoms/Loader';
-import { MsalProvider } from '@azure/msal-react';
+import { MsalAuthenticationTemplate, MsalProvider } from '@azure/msal-react';
 import { msalConfig } from 'configs/azureConfig';
 import { PublicClientApplication } from '@azure/msal-browser';
+import { InteractionType } from '@azure/msal-browser';
 
 function MyApp({ Component, pageProps }: AppProps) {
 	const [loading, setLoading] = useState(false);
@@ -21,7 +22,11 @@ function MyApp({ Component, pageProps }: AppProps) {
 	return (
 		<MsalProvider instance={msalInstance}>
 			<ThemeProvider theme={theme}>
-				<Layout>{!loading ? <Component {...pageProps} /> : <Loader />}</Layout>
+				<Layout>
+					<MsalAuthenticationTemplate interactionType={InteractionType.Redirect}>
+						<div>{!loading ? <Component {...pageProps} /> : <Loader />}</div>
+					</MsalAuthenticationTemplate>
+				</Layout>
 			</ThemeProvider>
 		</MsalProvider>
 	);
