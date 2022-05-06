@@ -1,6 +1,7 @@
 const tenantName = 'sachithatestapp2';
 const signInPolicy = 'B2C_1A_DEMO_SIGNUP_SIGNIN_FORCEPASSWORDRESET';
 const AuthorityUrl = `https://${tenantName}.b2clogin.com/${tenantName}.onmicrosoft.com/${signInPolicy}`;
+const PasswordResetAuthorityUrl = `https://${tenantName}.b2clogin.com/${tenantName}.onmicrosoft.com/B2C_1A_PASSWORDRESET`;
 const msalConfig = {
 	auth: {
 		clientId: 'afcff42d-55cc-45ea-8475-58214904c683', //"e3197c57-b74b-4d2c-98e7-7607f22e91f2",
@@ -12,7 +13,8 @@ const msalConfig = {
 		navigateToLoginRequestUrl: true,
 		client_secret: 'nEo8Q~XyvtT3xjEbGTuCMvocme2bRoJVkMSF.dcm', //"ETb8Q~~WwPfzRa0Lc5-T~w35Ys3JPTqI0EfoVbbc"
 		grant_type: 'authorization_code',
-		grantType: 'authorization_code'
+		grantType: 'authorization_code',
+		resetPasswordPolicy: 'B2C_1A_PASSWORDRESET'
 	},
 	cache: {
 		cacheLocation: 'sessionStorage', // This configures where your cache will be stored
@@ -20,10 +22,12 @@ const msalConfig = {
 	}
 };
 
+const forgotPasswordRequest = {
+	scopes: ["afcff42d-55cc-45ea-8475-58214904c683 openid offline_access"],
+	authority: PasswordResetAuthorityUrl
+}
+
 // Add scopes here for ID token to be used at Microsoft identity platform endpoints.
-// const loginRequest = {
-//    scopes: ["e3197c57-b74b-4d2c-98e7-7607f22e91f2"]
-//   };
 const loginRequest = {
 	scopes: ['afcff42d-55cc-45ea-8475-58214904c683 openid offline_access']
 };
@@ -34,4 +38,4 @@ const graphConfig = {
 };
 //graph.windows.net
 
-export { msalConfig, loginRequest, graphConfig };
+export { msalConfig, loginRequest, graphConfig, forgotPasswordRequest };
