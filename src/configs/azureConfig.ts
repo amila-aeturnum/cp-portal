@@ -10,11 +10,12 @@ const msalConfig = {
 		knownAuthorities: [`${tenantName}.b2clogin.com`],
 		validateAuthority: false,
 		postLogoutRedirectUri: 'http://localhost:3000',
-		navigateToLoginRequestUrl: true,
-		client_secret: 'nEo8Q~XyvtT3xjEbGTuCMvocme2bRoJVkMSF.dcm', //"ETb8Q~~WwPfzRa0Lc5-T~w35Ys3JPTqI0EfoVbbc"
-		grant_type: 'authorization_code',
-		grantType: 'authorization_code',
-		resetPasswordPolicy: 'B2C_1A_PASSWORDRESET'
+		//navigateToLoginRequestUrl: true,
+		// client_secret: 'nEo8Q~XyvtT3xjEbGTuCMvocme2bRoJVkMSF.dcm', //"ETb8Q~~WwPfzRa0Lc5-T~w35Ys3JPTqI0EfoVbbc"
+		// grant_type: 'authorization_code',
+		// grantType: 'authorization_code',
+		resetPasswordPolicy: 'B2C_1A_PASSWORDRESET',
+		navigateToLoginRequestUrl: false
 	},
 	cache: {
 		cacheLocation: 'sessionStorage', // This configures where your cache will be stored
@@ -24,7 +25,8 @@ const msalConfig = {
 
 const forgotPasswordRequest = {
 	scopes: ["afcff42d-55cc-45ea-8475-58214904c683 openid offline_access"],
-	authority: PasswordResetAuthorityUrl
+	authority: PasswordResetAuthorityUrl,
+	navigateToLoginRequestUrl: false
 }
 
 // Add scopes here for ID token to be used at Microsoft identity platform endpoints.
