@@ -36,7 +36,6 @@ export default function Layout(props: ILayout) {
 
 	useEffect(() => {
 		setIsAuth(isAuthenticated);
-		console.log(currentAccount);
 	}, [isAuthenticated]);
 
 	const handleDrawerOpen = () => {
