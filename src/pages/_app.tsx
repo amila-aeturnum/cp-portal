@@ -21,16 +21,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 	useEffect(() => {
 		const callbackId = msalInstance.addEventCallback((event) => {
-			console.log(typeof event.error);
-			console.log(event.error as Error);
-			console.log(event.error as AuthError);
 			if (event.eventType === EventType.LOGIN_FAILURE) {
 				if (event.error && (event.error as AuthError).errorMessage.indexOf('AADB2C90118') > -1) {
 					if (event.interactionType === InteractionType.Redirect) {
 						msalInstance.loginRedirect(forgotPasswordRequest);
 					}
 				} else if (event.error && (event.error as AuthError).errorMessage.indexOf('AADB2C90182') > -1) {
-					//debugger;
 					router.reload();
 				}
 			}
