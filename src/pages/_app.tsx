@@ -3,7 +3,7 @@ import type { AppProps } from 'next/app';
 import Layout from 'components/templates/Layout';
 import { ThemeProvider } from '@mui/material/styles';
 import { theme } from 'configs/theme';
-import { Router } from 'next/router';
+import router, { Router } from 'next/router';
 import { useEffect, useState } from 'react';
 import Loader from 'components/atoms/Loader';
 import { AuthenticatedTemplate, MsalAuthenticationTemplate, MsalProvider } from '@azure/msal-react';
@@ -21,11 +21,17 @@ function MyApp({ Component, pageProps }: AppProps) {
 
 	useEffect(() => {
 		const callbackId = msalInstance.addEventCallback((event) => {
+			console.log(typeof event.error);
+			console.log(event.error as Error);
+			console.log(event.error as AuthError);
 			if (event.eventType === EventType.LOGIN_FAILURE) {
 				if (event.error && (event.error as AuthError).errorMessage.indexOf('AADB2C90118') > -1) {
 					if (event.interactionType === InteractionType.Redirect) {
 						msalInstance.loginRedirect(forgotPasswordRequest);
 					}
+				} else if (event.error && (event.error as AuthError).errorMessage.indexOf('AADB2C90182') > -1) {
+					//debugger;
+					router.reload();
 				}
 			}
 		});
