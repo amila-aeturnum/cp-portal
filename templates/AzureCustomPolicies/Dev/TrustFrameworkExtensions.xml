@@ -1,20 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<TrustFrameworkPolicy 
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" 
-  PolicySchemaVersion="0.3.0.0" 
-  TenantId="sachithatestapp2.onmicrosoft.com" 
-  PolicyId="B2C_1A_TrustFrameworkExtensions" 
-  PublicPolicyUri="http://sachithatestapp2.onmicrosoft.com/B2C_1A_TrustFrameworkExtensions">
-  
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TrustFrameworkPolicy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" PolicySchemaVersion="0.3.0.0" TenantId="devconversionpath.onmicrosoft.com" PolicyId="B2C_1A_TrustFrameworkExtensions" PublicPolicyUri="http://devconversionpath.onmicrosoft.com/B2C_1A_TrustFrameworkExtensions">
+
   <BasePolicy>
-    <TenantId>sachithatestapp2.onmicrosoft.com</TenantId>
+    <TenantId>devconversionpath.onmicrosoft.com</TenantId>
     <PolicyId>B2C_1A_TrustFrameworkLocalization</PolicyId>
   </BasePolicy>
-  <BuildingBlocks>
-
-  </BuildingBlocks>
+  <BuildingBlocks></BuildingBlocks>
 
   <ClaimsProviders>
 
@@ -22,14 +13,14 @@
     <ClaimsProvider>
       <DisplayName>Local Account SignIn</DisplayName>
       <TechnicalProfiles>
-         <TechnicalProfile Id="login-NonInteractive">
+        <TechnicalProfile Id="login-NonInteractive">
           <Metadata>
-            <Item Key="client_id">9449d3f6-8ff0-4e8a-aa21-e2e56c91fc21</Item>
-            <Item Key="IdTokenAudience">bea77d08-a1e9-4538-9d97-794a6fa17206</Item>
+            <Item Key="client_id">0527feb0-5ebb-4096-8c5d-0ffeb4df4b8a</Item>
+            <Item Key="IdTokenAudience">07a5539a-d6d3-4e24-82aa-5bf1c73cc30f</Item>
           </Metadata>
           <InputClaims>
-            <InputClaim ClaimTypeReferenceId="client_id" DefaultValue="9449d3f6-8ff0-4e8a-aa21-e2e56c91fc21" />
-            <InputClaim ClaimTypeReferenceId="resource_id" PartnerClaimType="resource" DefaultValue="bea77d08-a1e9-4538-9d97-794a6fa17206" />
+            <InputClaim ClaimTypeReferenceId="client_id" DefaultValue="0527feb0-5ebb-4096-8c5d-0ffeb4df4b8a" />
+            <InputClaim ClaimTypeReferenceId="resource_id" PartnerClaimType="resource" DefaultValue="07a5539a-d6d3-4e24-82aa-5bf1c73cc30f" />
           </InputClaims>
         </TechnicalProfile>
       </TechnicalProfiles>
