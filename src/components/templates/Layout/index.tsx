@@ -133,7 +133,7 @@ export default function Layout(props: ILayout) {
 							<ListItemText primary={'Logout'} sx={{ opacity: open ? 1 : 0 }} />
 						</ListItemButton>
 					</List>
-					<div style={{ bottom: 10, position: 'fixed' }}>
+					<div style={{ bottom: 10, position: 'absolute', width: '100%' }}>
 						<IconButton onClick={open ? handleDrawerClose : handleDrawerOpen}>
 							{!open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
 						</IconButton>
@@ -159,6 +159,10 @@ export default function Layout(props: ILayout) {
 									primary={get(currentAccount, 'idTokenClaims.name')}
 									secondary={get(currentAccount, 'idTokenClaims.email')}
 									sx={{ opacity: open ? 1 : 0 }}
+									primaryTypographyProps={{
+										noWrap: true
+									}}
+									secondaryTypographyProps={{ noWrap: true }}
 								/>
 							</ListItem>
 						</List>
