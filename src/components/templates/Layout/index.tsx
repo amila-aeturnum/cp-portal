@@ -18,8 +18,6 @@ import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useEffect } from 'react';
 import { get } from 'lodash-es';
 import Loader from 'components/atoms/Loader';
-import Image from 'next/image';
-import logo from '../../../assets/app-logo.svg';
 
 interface ILayout {
 	children: React.ReactNode;
@@ -65,9 +63,7 @@ export default function Layout(props: ILayout) {
 				<CssBaseline />
 				<Drawer variant="permanent" open={open}>
 					<DrawerHeader sx={{ height: 140 }}>
-						<div style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto', width: '50%' }}>
-							<Image src={logo} width="100%" height="100%" alt="logo" />
-						</div>
+						<div style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto', width: '50%' }}></div>
 					</DrawerHeader>
 					<Divider />
 					<List sx={{ overflowY: 'auto', overflowX: 'hidden', height: '40%' }}>
