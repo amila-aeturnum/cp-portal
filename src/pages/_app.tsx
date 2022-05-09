@@ -10,7 +10,7 @@ import { AuthenticatedTemplate, MsalAuthenticationTemplate, MsalProvider } from 
 import { forgotPasswordRequest, msalConfig } from 'configs/azureConfig';
 import { AuthError, EventType, PublicClientApplication } from '@azure/msal-browser';
 import { InteractionType } from '@azure/msal-browser';
-import { MsalErrorCode } from 'common/enums/msalErrorCode';
+import MsalErrorCode from 'common/enums/msalErrorCode';
 
 function MyApp({ Component, pageProps }: AppProps) {
 	const [loading, setLoading] = useState(false);
