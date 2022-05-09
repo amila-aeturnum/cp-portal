@@ -10,6 +10,7 @@ import { AuthenticatedTemplate, MsalAuthenticationTemplate, MsalProvider } from 
 import { forgotPasswordRequest, msalConfig } from 'configs/azureConfig';
 import { AuthError, EventType, PublicClientApplication } from '@azure/msal-browser';
 import { InteractionType } from '@azure/msal-browser';
+import { MsalErrorCode } from 'common/enums/msalErrorCode';
 
 function MyApp({ Component, pageProps }: AppProps) {
 	const [loading, setLoading] = useState(false);
@@ -22,11 +23,12 @@ function MyApp({ Component, pageProps }: AppProps) {
 	useEffect(() => {
 		const callbackId = msalInstance.addEventCallback((event) => {
 			if (event.eventType === EventType.LOGIN_FAILURE) {
-				if (event.error && (event.error as AuthError).errorMessage.indexOf('AADB2C90118') > -1) {
-					if (event.interactionType === InteractionType.Redirect) {
-						msalInstance.loginRedirect(forgotPasswordRequest);
-					}
-				} else if (event.error && (event.error as AuthError).errorMessage.indexOf('AADB2C90182') > -1) {
+				if (event.error && (event.error as AuthError).errorMessage.indexOf(MsalErrorCode.FORGOTTEN_PASSWORD) > -1) {
+					msalInstance.loginRedirect(forgotPasswordRequest);
+				} else if (
+					event.error &&
+					(event.error as AuthError).errorMessage.indexOf(MsalErrorCode.CODE_VERIFIER_NOT_MATCH) > -1
+				) {
 					router.reload();
 				}
 			}
