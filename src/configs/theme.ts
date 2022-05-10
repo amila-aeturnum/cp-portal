@@ -1,5 +1,6 @@
 import { createTheme } from '@mui/material/styles';
 
+
 declare module '@mui/material/styles' {
 	interface Theme {
 		primary: {
@@ -28,6 +29,27 @@ export const theme = createTheme({
 		main: '#352B61'
 	},
 	palette: {
-		mode: 'light'
+		mode: 'light',
+	},
+	components: {
+		MuiButton:{
+			variants:[
+				{
+					props: { variant : 'contained'},
+					style:{
+						backgroundColor: '#352B61',
+						fontWeight:700,
+						transform: 'none',
+						fontSize: '0.875em',
+						fontFamily: 'Poppins'
+					},
+				}
+			]
+		}
+	},
+	typography: {
+		button: {
+			textTransform: 'none'
+		}
 	}
 });
