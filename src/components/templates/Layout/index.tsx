@@ -18,6 +18,9 @@ import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useEffect } from 'react';
 import { get } from 'lodash-es';
 import Loader from 'components/atoms/Loader';
+import { loginRequest } from 'configs/azureConfig';
+import { setAuthToken } from 'utils/localStorageUtil';
+import axiosInstance from 'configs/axiosConfig';
 
 interface ILayout {
 	children: React.ReactNode;
@@ -26,21 +29,43 @@ interface ILayout {
 export default function Layout(props: ILayout) {
 	const { children } = props;
 	const [open, setOpen] = React.useState(true);
-	const [isAuth, setIsAuth] = React.useState<boolean>();
+	const [authenticated, setAuthenticated] = React.useState<boolean>();
 	const router = useRouter();
 	const { instance, accounts } = useMsal();
 	const isAuthenticated = useIsAuthenticated();
 	const currentAccount = accounts[0];
 
+	const request = {
+		...loginRequest,
+		account: currentAccount
+	};
+
 	useEffect(() => {
-		setIsAuth(isAuthenticated);
+		setAuthenticated(isAuthenticated);
 	}, [isAuthenticated]);
 
-	const handleDrawerOpen = () => {
+	useEffect(() => {
+		if (authenticated) {
+			instance.acquireTokenSilent(request).then((response) => {
+				const accessToken = response.accessToken;
+				setAuthToken(accessToken);
+				axiosInstance
+					.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/profile`)
+					.then(function (response) {
+						console.log(response);
+					})
+					.catch((error) => {
+						console.log(error);
+					});
+			});
+		}
+	}, [authenticated]);
+
+	const handleSideNavOpen = () => {
 		setOpen(true);
 	};
 
-	const handleDrawerClose = () => {
+	const handleSideNavClose = () => {
 		setOpen(false);
 	};
 
@@ -50,7 +75,7 @@ export default function Layout(props: ILayout) {
 		});
 	};
 
-	if (!isAuth) {
+	if (!authenticated) {
 		return (
 			<>
 				<Loader />
@@ -134,7 +159,7 @@ export default function Layout(props: ILayout) {
 						</ListItemButton>
 					</List>
 					<div style={{ bottom: 10, position: 'absolute', width: '100%' }}>
-						<IconButton onClick={open ? handleDrawerClose : handleDrawerOpen}>
+						<IconButton onClick={open ? handleSideNavClose : handleSideNavOpen}>
 							{!open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
 						</IconButton>
 						<List>
