@@ -19,11 +19,13 @@ declare module '@mui/material/styles' {
 			main?: string;
 		};
 	}
-}
-export const enum cpColor {
-	primary = '#352B61',
-	primaryBackground = "#FFFFFF",
-	disableBackgroundLight = '#E9E9EB'
+	interface PaletteOptions {
+		cpSwitch: {
+			primaryBackground: string;
+			disableBackground: string;
+		}
+		
+	  }
 }
 
 export const theme = createTheme({
@@ -31,10 +33,14 @@ export const theme = createTheme({
 		main: '#00000'
 	},
 	secondary: {
-		main: cpColor.primary
+		main: '#352B61'
 	},
 	palette: {
 		mode: 'light',
+		cpSwitch: {
+			primaryBackground: "#FFFFFF",
+			disableBackground: "#E9E9EB"
+		}
 	},
 	components: {
 		MuiButton:{
@@ -42,17 +48,20 @@ export const theme = createTheme({
 				{
 					props: { variant : 'contained'},
 					style:{
-						backgroundColor: cpColor.primary,
+						backgroundColor: '#352B61',
 						fontWeight:700,
 						transform: 'none',
 						fontSize: '0.875em',
-						fontFamily: 'Poppins'
+						"&:hover": {
+							backgroundColor: '#352B61',
+						  }
 					},
 				}
 			]
 		}
 	},
 	typography: {
+		fontFamily: 'Poppins',
 		button: {
 			textTransform: 'none'
 		}

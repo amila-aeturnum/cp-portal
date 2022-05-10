@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Switch, { SwitchProps } from '@mui/material/Switch';
 import { styled } from '@mui/material/styles';
-import { cpColor } from 'configs/theme';
 import { ButtonBaseActions } from '@mui/material';
 interface ICPSwitch {
 	disabled?: boolean;
@@ -24,9 +23,9 @@ const IOSSwitch = styled((props: SwitchProps) => (
 		transitionDuration: '300ms',
 		'&.Mui-checked': {
 			transform: 'translateX(20px)',
-			color: cpColor.primaryBackground,
+			color: theme.palette.cpSwitch.primaryBackground,
 			'& + .MuiSwitch-track': {
-				backgroundColor: cpColor.primary,
+				backgroundColor: theme.secondary.main,
 				opacity: 1,
 				border: 0
 			},
@@ -35,8 +34,8 @@ const IOSSwitch = styled((props: SwitchProps) => (
 			}
 		},
 		'&.Mui-focusVisible .MuiSwitch-thumb': {
-			color: cpColor.primary,
-			border: '6px solid ' + cpColor.primaryBackground
+			color: theme.secondary.main,
+			border: '6px solid ' + theme.palette.cpSwitch.primaryBackground
 		},
 		'&.Mui-disabled .MuiSwitch-thumb': {
 			color: theme.palette.grey[100]
@@ -52,7 +51,7 @@ const IOSSwitch = styled((props: SwitchProps) => (
 	},
 	'& .MuiSwitch-track': {
 		borderRadius: 32 / 2,
-		backgroundColor: cpColor.disableBackgroundLight,
+		backgroundColor: theme.palette.cpSwitch.disableBackground,
 		opacity: 1,
 		transition: theme.transitions.create(['background-color'], {
 			duration: 500
