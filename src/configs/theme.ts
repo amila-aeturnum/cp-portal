@@ -20,13 +20,18 @@ declare module '@mui/material/styles' {
 		};
 	}
 }
+export const enum cpColor {
+	primary = '#352B61',
+	primaryBackground = "#FFFFFF",
+	disableBackgroundLight = '#E9E9EB'
+}
 
 export const theme = createTheme({
 	primary: {
 		main: '#00000'
 	},
 	secondary: {
-		main: '#352B61'
+		main: cpColor.primary
 	},
 	palette: {
 		mode: 'light',
@@ -37,7 +42,7 @@ export const theme = createTheme({
 				{
 					props: { variant : 'contained'},
 					style:{
-						backgroundColor: '#352B61',
+						backgroundColor: cpColor.primary,
 						fontWeight:700,
 						transform: 'none',
 						fontSize: '0.875em',
