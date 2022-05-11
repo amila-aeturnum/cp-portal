@@ -2,14 +2,18 @@ import * as React from 'react';
 import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 
 interface ICPSingleSelectDropDown {
-	options:[]
+	options: OptionItem[];
 	label?: string;
 	handleChange: (text: string) => void;
 }
-
+interface OptionItem {
+	key: string;
+	value: string;
+	id: number;
+}
 export default function CPSingleSelectDropDown(props: ICPSingleSelectDropDown) {
 	const [age, setAge] = React.useState('');
-	const { label,options } = props;
+	const { label, options } = props;
 	const handleChange = (event: SelectChangeEvent) => {
 		setAge(event.target.value as string);
 	};
@@ -23,9 +27,11 @@ export default function CPSingleSelectDropDown(props: ICPSingleSelectDropDown) {
 				label={label}
 				onChange={handleChange}
 			>
-				<MenuItem value={10}>Funnel Name</MenuItem>
-				<MenuItem value={20}>Twenty</MenuItem>
-				<MenuItem value={30}>Thirty</MenuItem>
+				{Object.values(options).map((option) => (
+					<MenuItem key="option.key" value={option.value}>
+						{option.value}
+					</MenuItem>
+				))}
 			</Select>
 		</FormControl>
 	);
