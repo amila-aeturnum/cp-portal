@@ -4,7 +4,7 @@ import TextField from '@mui/material/TextField';
 
 interface ICPTextField {
 	label?: string;
-	handleChange: (text: string) => void;
+	handleChange?: () => void;
 }
 
 export default function CPTextField(props: ICPTextField) {
@@ -15,7 +15,7 @@ export default function CPTextField(props: ICPTextField) {
 			id="outlined-basic"
 			label={label}
 			variant="outlined"
-			onChange={(e) => handleChange(e.target.value)}
+			onChange={handleChange}
 		/>
 	);
 }

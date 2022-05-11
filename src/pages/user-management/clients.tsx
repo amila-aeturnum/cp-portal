@@ -4,12 +4,12 @@ import * as React from 'react';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import ResponsiveDialog from 'components/molecules/ResponsiveDialog';
 import { Button, Grid, OutlinedInput, InputAdornment } from '@mui/material';
-import TextField from '@mui/material/TextField';
 import AddIcon from '@mui/icons-material/Add';
 import DataTable from 'components/molecules/DataTable';
 import CPButton from 'components/atoms/CPButton';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import SearchIcon from '@mui/icons-material/Search';
+import CPTextField from 'components/atoms/CPTextField';
 
 const Clients: NextPage = () => {
 	const [open, setOpen] = React.useState(false);
@@ -32,16 +32,16 @@ const Clients: NextPage = () => {
 	const dialogContent = (
 		<Grid container spacing={3} sx={{ marginTop: '10px' }}>
 			<Grid item xs={6}>
-				<TextField id="outlined-basic" label="Outlined" variant="outlined" fullWidth />
+				<CPTextField label="Outlined" />
 			</Grid>
 			<Grid item xs={6}>
-				<TextField id="filled-basic" label="Filled" variant="outlined" fullWidth />
+				<CPTextField label="Filled" />
 			</Grid>
 			<Grid item xs={6}>
-				<TextField id="filled-basic" label="Filled" variant="outlined" fullWidth />
+				<CPTextField label="Filled" />
 			</Grid>
 			<Grid item xs={6}>
-				<TextField id="filled-basic" label="Filled" variant="outlined" fullWidth />
+				<CPTextField label="Filled" />
 			</Grid>
 		</Grid>
 	);
@@ -80,7 +80,7 @@ const Clients: NextPage = () => {
 						<Grid item xs={5} alignItems="right">
 							<OutlinedInput
 								id="standard-basic"
-								sx={{ border: '1px solid #A9A8A8', width: '100%' }}
+								sx={{ border: '1px solid #A9A8A8', width: '100%', height: '48px' }}
 								startAdornment={
 									<InputAdornment position="start">
 										<SearchIcon />

@@ -2,7 +2,7 @@ import { TableCell, TableHead, TableRow } from '@mui/material';
 import * as React from 'react';
 
 interface IColumn {
-	id: string;
+	id: 'name' | 'code' | 'population' | 'size';
 	label: string;
 	minWidth?: number;
 	align?: 'right' | 'left';

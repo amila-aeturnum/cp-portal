@@ -100,7 +100,7 @@ export default function Layout(props: ILayout) {
 									justifyContent: open ? 'initial' : 'center',
 									px: 2.5
 								}}
-								onClick={() => router.push('/user-management/clients')}
+								onClick={() => router.push('/')}
 							>
 								<ListItemIcon
 									sx={{
