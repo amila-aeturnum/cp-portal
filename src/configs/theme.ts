@@ -1,5 +1,4 @@
-import { createTheme } from '@mui/material/styles';
-
+import { createTheme, PaletteOptions, SimplePaletteColorOptions } from '@mui/material/styles';
 
 declare module '@mui/material/styles' {
 	interface Theme {
@@ -19,14 +18,42 @@ declare module '@mui/material/styles' {
 			main?: string;
 		};
 	}
-	interface PaletteOptions {
-		cpSwitch: {
+	interface SimplePaletteColorOptions {
+		cpSwitch?: {
 			primaryBackground: string;
 			disableBackground: string;
-		}
-		
+		};
+	  }
+	
+	  interface  PaletteColor {
+		cpSwitch?: {
+			primaryBackground: string;
+			disableBackground: string;
+		};
 	  }
 }
+
+interface DefaultPaletteOptions extends PaletteOptions {
+	primary?: SimplePaletteColorOptions;
+  }
+  const DefaultPalette = (): DefaultPaletteOptions => {
+	return {
+		mode: 'light',
+		primary: {
+		main: "#352B61",
+		cpSwitch: {
+			primaryBackground: "#FFFFFF",
+			disableBackground: "#E9E9EB"
+		},
+	  }
+	};
+  };
+  
+	const defaultColors = DefaultPalette();
+	
+	const palette: PaletteOptions = {
+	  ...defaultColors,
+	};
 
 export const theme = createTheme({
 	primary: {
@@ -35,13 +62,7 @@ export const theme = createTheme({
 	secondary: {
 		main: '#352B61'
 	},
-	palette: {
-		mode: 'light',
-		cpSwitch: {
-			primaryBackground: "#FFFFFF",
-			disableBackground: "#E9E9EB"
-		}
-	},
+	palette,
 	components: {
 		MuiButton:{
 			variants:[
