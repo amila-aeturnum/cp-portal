@@ -18,6 +18,9 @@ import { useIsAuthenticated, useMsal } from '@azure/msal-react';
 import { useEffect } from 'react';
 import { get } from 'lodash-es';
 import Loader from 'components/atoms/Loader';
+import { loginRequest } from 'configs/azureConfig';
+import { setAuthToken } from 'utils/localStorageUtil';
+import axiosInstance from 'configs/axiosConfig';
 
 interface ILayout {
 	children: React.ReactNode;
@@ -25,47 +28,68 @@ interface ILayout {
 
 export default function Layout(props: ILayout) {
 	const { children } = props;
-	const [open, setOpen] = React.useState(false);
-	const [isAuth, setIsAuth] = React.useState<boolean>();
+	const [open, setOpen] = React.useState(true);
+	const [authenticated, setAuthenticated] = React.useState<boolean>();
 	const router = useRouter();
 	const { instance, accounts } = useMsal();
 	const isAuthenticated = useIsAuthenticated();
 	const currentAccount = accounts[0];
 
+	const request = {
+		...loginRequest,
+		account: currentAccount
+	};
+
 	useEffect(() => {
-		if (!isAuthenticated) {
-			handleLogin();
-		}
-		setIsAuth(isAuthenticated);
+		setAuthenticated(isAuthenticated);
 	}, [isAuthenticated]);
 
-	const handleDrawerOpen = () => {
+	useEffect(() => {
+		if (authenticated) {
+			instance.acquireTokenSilent(request).then((response) => {
+				const accessToken = response.accessToken;
+				setAuthToken(accessToken);
+				axiosInstance
+					.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/profile`)
+					.then(function (response) {
+						console.log(response);
+					})
+					.catch((error) => {
+						console.log(error);
+					});
+			});
+		}
+	}, [authenticated]);
+
+	const handleSideNavOpen = () => {
 		setOpen(true);
 	};
 
-	const handleDrawerClose = () => {
+	const handleSideNavClose = () => {
 		setOpen(false);
 	};
 
-	const handleLogin = async () => {
-		await instance.loginRedirect().catch(() => {});
+	const handleLogout = () => {
+		instance.logoutRedirect({
+			account: currentAccount
+		});
 	};
 
-	const handleLogout = () => {
-		instance
-			.logoutRedirect({
-				account: currentAccount
-			})
-			.then(() => handleLogin());
-	};
-	if (!isAuth) {
-		return <Loader />;
+	if (!authenticated) {
+		return (
+			<>
+				<Loader />
+				{children}
+			</>
+		);
 	} else {
 		return (
 			<Box sx={{ display: 'flex' }}>
 				<CssBaseline />
 				<Drawer variant="permanent" open={open}>
-					<DrawerHeader sx={{ height: 140 }}></DrawerHeader>
+					<DrawerHeader sx={{ height: 140 }}>
+						<div style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto', width: '50%' }}></div>
+					</DrawerHeader>
 					<Divider />
 					<List sx={{ overflowY: 'auto', overflowX: 'hidden', height: '40%' }}>
 						{['User Management', 'Global Query List', 'Customized Queries', 'Statistics'].map((text, index) => (
@@ -76,6 +100,7 @@ export default function Layout(props: ILayout) {
 									justifyContent: open ? 'initial' : 'center',
 									px: 2.5
 								}}
+								onClick={() => router.push('/user-management/clients')}
 							>
 								<ListItemIcon
 									sx={{
@@ -100,7 +125,6 @@ export default function Layout(props: ILayout) {
 									justifyContent: open ? 'initial' : 'center',
 									px: 2.5
 								}}
-								onClick={() => router.push('/user-management/clients')}
 							>
 								<ListItemIcon
 									sx={{
@@ -134,8 +158,8 @@ export default function Layout(props: ILayout) {
 							<ListItemText primary={'Logout'} sx={{ opacity: open ? 1 : 0 }} />
 						</ListItemButton>
 					</List>
-					<div style={{ bottom: 10, position: 'fixed' }}>
-						<IconButton onClick={open ? handleDrawerClose : handleDrawerOpen}>
+					<div style={{ bottom: 10, position: 'absolute', width: '100%' }}>
+						<IconButton onClick={open ? handleSideNavClose : handleSideNavOpen}>
 							{!open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
 						</IconButton>
 						<List>
@@ -158,8 +182,12 @@ export default function Layout(props: ILayout) {
 								</ListItemIcon>
 								<ListItemText
 									primary={get(currentAccount, 'idTokenClaims.name')}
-									secondary={'user@outlook.com'}
+									secondary={get(currentAccount, 'idTokenClaims.email')}
 									sx={{ opacity: open ? 1 : 0 }}
+									primaryTypographyProps={{
+										noWrap: true
+									}}
+									secondaryTypographyProps={{ noWrap: true }}
 								/>
 							</ListItem>
 						</List>

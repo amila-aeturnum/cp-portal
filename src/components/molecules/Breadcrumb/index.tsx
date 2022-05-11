@@ -19,19 +19,19 @@ export default function Breadcrumb(props: IBreadcrumb) {
 	const breadcrumbs = [
 		<Link underline="hover" key="1" color="inherit" href="/" onClick={handleClick}>
 			Dashboard
-		</Link>,
-		<Link
-			underline="hover"
-			key="2"
-			color="inherit"
-			href="/material-ui/getting-started/installation/"
-			onClick={handleClick}
-		>
-			Core
-		</Link>,
-		<Typography key="3" color="text.primary">
-			Breadcrumb
-		</Typography>
+		</Link>
+		// <Link
+		// 	underline="hover"
+		// 	key="2"
+		// 	color="inherit"
+		// 	href="/material-ui/getting-started/installation/"
+		// 	onClick={handleClick}
+		// >
+		// 	Core
+		// </Link>,
+		// <Typography key="3" color="text.primary">
+		// 	Breadcrumb
+		// </Typography>
 	];
 
 	return (

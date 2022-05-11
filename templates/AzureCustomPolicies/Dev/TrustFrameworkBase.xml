@@ -1,12 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<TrustFrameworkPolicy
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06"
-  PolicySchemaVersion="0.3.0.0"
-  TenantId="sachithatestapp2.onmicrosoft.com"
-  PolicyId="B2C_1A_TrustFrameworkBase"
-  PublicPolicyUri="http://sachithatestapp2.onmicrosoft.com/B2C_1A_TrustFrameworkBase">
+<TrustFrameworkPolicy xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://schemas.microsoft.com/online/cpim/schemas/2013/06" PolicySchemaVersion="0.3.0.0" TenantId="devconversionpath.onmicrosoft.com" PolicyId="B2C_1A_TrustFrameworkBase" PublicPolicyUri="http://devconversionpath.onmicrosoft.com/B2C_1A_TrustFrameworkBase">
 
   <BuildingBlocks>
     <ClaimsSchema>
@@ -29,7 +22,7 @@
       <ClaimType Id="socialIdpUserId">
         <DisplayName>Username</DisplayName>
         <DataType>string</DataType>
-        <UserHelpText/>
+        <UserHelpText />
         <UserInputType>TextBox</UserInputType>
         <Restriction>
           <Pattern RegularExpression="^[a-zA-Z0-9]+[a-zA-Z0-9_-]*$" HelpText="The username you provided is not valid. It must begin with an alphabet or number and can contain alphabets, numbers and the following symbols: _ -" />
@@ -69,7 +62,7 @@
       <ClaimType Id="signInName">
         <DisplayName>Sign in name</DisplayName>
         <DataType>string</DataType>
-        <UserHelpText/>
+        <UserHelpText />
         <UserInputType>TextBox</UserInputType>
         <Restriction>
           <Pattern RegularExpression="^[a-zA-Z0-9.+!#$%&amp;'^_`{}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" HelpText="Please enter a valid email address." />
@@ -105,9 +98,10 @@
         <DataType>string</DataType>
         <UserHelpText>Enter new password</UserHelpText>
         <UserInputType>Password</UserInputType>
-        <Restriction>
+        <PredicateValidationReference Id="CustomPassword" />
+        <!-- <Restriction>
           <Pattern RegularExpression="^((?=.*[a-z])(?=.*[A-Z])(?=.*\d)|(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])|(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])|(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]))([A-Za-z\d@#$%^&amp;*\-_+=[\]{}|\\:',?/`~&quot;();!]|\.(?!@)){8,16}$" HelpText="8-16 characters, containing 3 out of 4 of the following: Lowercase characters, uppercase characters, digits (0-9), and one or more of the following symbols: @ # $ % ^ &amp; * - _ + = [ ] { } | \ : ' , ? / ` ~ &quot; ( ) ; ." />
-        </Restriction>
+        </Restriction> -->
       </ClaimType>
       <!-- The password regular expression above is constructed for AAD passwords based on restrictions at https://msdn.microsoft.com/en-us/library/azure/jj943764.aspx
 
@@ -129,9 +123,10 @@
         <DataType>string</DataType>
         <UserHelpText>Confirm new password</UserHelpText>
         <UserInputType>Password</UserInputType>
-        <Restriction>
+        <PredicateValidationReference Id="CustomPassword" />
+        <!-- <Restriction>
           <Pattern RegularExpression="^((?=.*[a-z])(?=.*[A-Z])(?=.*\d)|(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])|(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9])|(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]))([A-Za-z\d@#$%^&amp;*\-_+=[\]{}|\\:',?/`~&quot;();!]|\.(?!@)){8,16}$" HelpText=" " />
-        </Restriction>
+        </Restriction> -->
       </ClaimType>
 
       <ClaimType Id="passwordPolicies">
@@ -160,7 +155,7 @@
         <DefaultPartnerClaimTypes>
           <Protocol Name="OpenIdConnect" PartnerClaimType="sub" />
         </DefaultPartnerClaimTypes>
-        <UserHelpText/>
+        <UserHelpText />
       </ClaimType>
 
       <ClaimType Id="identityProvider">
@@ -171,7 +166,7 @@
           <Protocol Name="OpenIdConnect" PartnerClaimType="idp" />
           <Protocol Name="SAML2" PartnerClaimType="http://schemas.microsoft.com/identity/claims/identityprovider" />
         </DefaultPartnerClaimTypes>
-        <UserHelpText/>
+        <UserHelpText />
       </ClaimType>
 
       <ClaimType Id="displayName">
@@ -225,7 +220,7 @@
       <ClaimType Id="newUser">
         <DisplayName>User is new</DisplayName>
         <DataType>boolean</DataType>
-        <UserHelpText/>
+        <UserHelpText />
       </ClaimType>
 
       <ClaimType Id="executed-SelfAsserted-Input">
@@ -298,7 +293,75 @@
         <UserInputType>TextBox</UserInputType>
       </ClaimType>
 
+      <ClaimType Id="jobTitle">
+        <DisplayName>Job Title</DisplayName>
+        <DataType>string</DataType>
+        <DefaultPartnerClaimTypes>
+          <Protocol Name="OAuth2" PartnerClaimType="jobTitle" />
+          <Protocol Name="OpenIdConnect" PartnerClaimType="jobTitle" />
+          <Protocol Name="SAML2" PartnerClaimType="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/jobtitle" />
+        </DefaultPartnerClaimTypes>
+      </ClaimType>
+
+
     </ClaimsSchema>
+
+    <Predicates>
+      <Predicate Id="LengthRange" Method="IsLengthRange">
+        <UserHelpText>Minimum 8 characters.</UserHelpText>
+        <Parameters>
+          <Parameter Id="Minimum">8</Parameter>
+          <Parameter Id="Maximum">20</Parameter>
+        </Parameters>
+      </Predicate>
+      <Predicate Id="Lowercase" Method="IncludesCharacters">
+        <UserHelpText>At least one lowercase letter</UserHelpText>
+        <Parameters>
+          <Parameter Id="CharacterSet">a-z</Parameter>
+        </Parameters>
+      </Predicate>
+      <Predicate Id="Uppercase" Method="IncludesCharacters">
+        <UserHelpText>At least one capital letter</UserHelpText>
+        <Parameters>
+          <Parameter Id="CharacterSet">A-Z</Parameter>
+        </Parameters>
+      </Predicate>
+      <Predicate Id="Number" Method="IncludesCharacters">
+        <UserHelpText>At least one number</UserHelpText>
+        <Parameters>
+          <Parameter Id="CharacterSet">0-9</Parameter>
+        </Parameters>
+      </Predicate>
+      <Predicate Id="Symbol" Method="IncludesCharacters">
+        <UserHelpText>At least one special characters</UserHelpText>
+        <Parameters>
+          <Parameter Id="CharacterSet">@#$%^&amp;*\-_+=[]{}|\\:',.?/`~"();!</Parameter>
+        </Parameters>
+      </Predicate>
+    </Predicates>
+
+    <PredicateValidations>
+      <PredicateValidation Id="CustomPassword">
+        <PredicateGroups>
+          <!-- <PredicateGroup Id="LengthGroup">
+            <PredicateReferences MatchAtLeast="1">
+              <PredicateReference Id="LengthRange" />
+            </PredicateReferences>
+          </PredicateGroup> -->
+          <PredicateGroup Id="CharacterClasses">
+            <UserHelpText>Password must meet the following requirements:</UserHelpText>
+            <PredicateReferences MatchAtLeast="5">
+              <PredicateReference Id="Lowercase" />
+              <PredicateReference Id="Uppercase" />
+              <PredicateReference Id="Number" />
+              <PredicateReference Id="Symbol" />
+              <PredicateReference Id="LengthRange" />
+            </PredicateReferences>
+          </PredicateGroup>
+        </PredicateGroups>
+      </PredicateValidation>
+    </PredicateValidations>
+
 
     <ClaimsTransformations>
       <ClaimsTransformation Id="CreateOtherMailsFromEmail" TransformationMethod="AddItemToStringCollection">
@@ -360,7 +423,7 @@
       </ContentDefinition>
 
       <ContentDefinition Id="api.signuporsignin">
-        <LoadUri>https://blobstoragetestapp.blob.core.windows.net/auth-teplates/pages/login.html</LoadUri>
+        <LoadUri>https://devconversionpath.blob.core.windows.net/authflowtemplates/Login.html</LoadUri>
         <!-- <LoadUri>~/tenant/templates/AzureBlue/unified.cshtml</LoadUri> -->
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
         <DataUri>urn:com:microsoft:aad:b2c:elements:contract:unifiedssp:2.1.5</DataUri>
@@ -372,13 +435,13 @@
       </ContentDefinition>
 
       <ContentDefinition Id="api.selfasserted">
-        <LoadUri>https://blobstoragetestapp.blob.core.windows.net/auth-teplates/pages/changepassword.html</LoadUri>
+        <LoadUri>https://devconversionpath.blob.core.windows.net/authflowtemplates/ChangePassword.html</LoadUri>
         <!-- <LoadUri>~/tenant/templates/AzureBlue/selfAsserted.cshtml</LoadUri> -->
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
         <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
         <Metadata>
           <Item Key="DisplayName">Collect information from user page</Item>
-          <Item Key="setting.showCancelButton">false</Item>    
+          <Item Key="setting.showCancelButton">false</Item>
         </Metadata>
       </ContentDefinition>
 
@@ -401,7 +464,7 @@
       </ContentDefinition>
 
       <ContentDefinition Id="api.localaccountpasswordreset">
-        <LoadUri>https://blobstoragetestapp.blob.core.windows.net/auth-teplates/pages/passwordreset.html</LoadUri>
+        <LoadUri>https://devconversionpath.blob.core.windows.net/authflowtemplates/PasswordReset.html</LoadUri>
         <!-- <LoadUri>~/tenant/templates/AzureBlue/selfAsserted.cshtml</LoadUri> -->
         <RecoveryUri>~/common/default_page_error.html</RecoveryUri>
         <DataUri>urn:com:microsoft:aad:b2c:elements:contract:selfasserted:2.1.7</DataUri>
@@ -499,8 +562,8 @@
             <PersistedClaim ClaimTypeReferenceId="email" PartnerClaimType="signInNames.emailAddress" />
             <PersistedClaim ClaimTypeReferenceId="newPassword" PartnerClaimType="password" />
             <PersistedClaim ClaimTypeReferenceId="displayName" DefaultValue="unknown" />
-            <PersistedClaim ClaimTypeReferenceId="passwordPolicies" DefaultValue="DisablePasswordExpiration" />
-
+            <!-- <PersistedClaim ClaimTypeReferenceId="passwordPolicies" DefaultValue="DisablePasswordExpiration" /> -->
+            <PersistedClaim ClaimTypeReferenceId="passwordPolicies" DefaultValue="DisablePasswordExpiration, DisableStrongPassword" />
             <!-- Optional claims. -->
             <PersistedClaim ClaimTypeReferenceId="givenName" />
             <PersistedClaim ClaimTypeReferenceId="surname" />
@@ -536,6 +599,7 @@
             <OutputClaim ClaimTypeReferenceId="accountEnabled" />
             <OutputClaim ClaimTypeReferenceId="otherMails" />
             <OutputClaim ClaimTypeReferenceId="signInNames.emailAddress" />
+            <OutputClaim ClaimTypeReferenceId="jobTitle" PartnerClaimType="jobTitle" />
           </OutputClaims>
           <OutputClaimsTransformations>
             <OutputClaimsTransformation ReferenceId="AssertAccountEnabledIsTrue" />
@@ -555,7 +619,7 @@
           <PersistedClaims>
             <PersistedClaim ClaimTypeReferenceId="objectId" />
             <PersistedClaim ClaimTypeReferenceId="newPassword" PartnerClaimType="password" />
-
+            <PersistedClaim ClaimTypeReferenceId="passwordPolicies" DefaultValue="DisablePasswordExpiration, DisableStrongPassword" />
           </PersistedClaims>
           <IncludeTechnicalProfile ReferenceId="AAD-Common" />
         </TechnicalProfile>
@@ -601,6 +665,7 @@
             <OutputClaim ClaimTypeReferenceId="otherMails" />
             <OutputClaim ClaimTypeReferenceId="givenName" />
             <OutputClaim ClaimTypeReferenceId="surname" />
+            <OutputClaim ClaimTypeReferenceId="jobTitle" PartnerClaimType="jobTitle" />
           </OutputClaims>
           <IncludeTechnicalProfile ReferenceId="AAD-Common" />
         </TechnicalProfile>
@@ -724,7 +789,8 @@
             <OutputClaim ClaimTypeReferenceId="objectId" />
             <OutputClaim ClaimTypeReferenceId="userPrincipalName" />
             <OutputClaim ClaimTypeReferenceId="authenticationSource" />
-
+            <OutputClaim ClaimTypeReferenceId="displayName" />
+            <OutputClaim ClaimTypeReferenceId="jobTitle" PartnerClaimType="jobTitle" />
           </OutputClaims>
           <ValidationTechnicalProfiles>
             <ValidationTechnicalProfile ReferenceId="AAD-UserReadUsingEmailAddress" />
@@ -812,6 +878,8 @@
             <Item Key="client_id">{service:te}</Item>
             <Item Key="issuer_refresh_token_user_identity_claim_type">objectId</Item>
             <Item Key="SendTokenResponseBodyWithJsonNumbers">true</Item>
+            <Item Key="token_lifetime_secs">86400</Item> <!-- (3600:1h), (86400:1day)-->
+            <Item Key="id_token_lifetime_secs">86400</Item>
           </Metadata>
           <CryptographicKeys>
             <Key Id="issuer_secret" StorageReferenceId="B2C_1A_TokenSigningKeyContainer" />
