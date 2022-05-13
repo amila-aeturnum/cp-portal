@@ -158,6 +158,7 @@
           <LocalizedString ElementType="ClaimType" ElementId="reenterPassword" StringId="DisplayName">Confirm new password</LocalizedString>
           <LocalizedString ElementType="ClaimType" ElementId="newPassword" StringId="DisplayName">New password</LocalizedString>
           <LocalizedString ElementType="UxElement" StringId="button_continue">Save</LocalizedString>
+          <LocalizedString ElementType="ErrorMessage" StringId="UserMessageIfInvalidPassword">Temporary password is incorrect.</LocalizedString>
         </LocalizedStrings>
       </LocalizedResources>
 
