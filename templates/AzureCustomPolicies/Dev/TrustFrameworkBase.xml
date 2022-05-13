@@ -308,7 +308,7 @@
 
     <Predicates>
       <Predicate Id="LengthRange" Method="IsLengthRange">
-        <UserHelpText>Minimum 8 characters.</UserHelpText>
+        <UserHelpText>Minimum 8 characters &amp; maximum 20 characters</UserHelpText>
         <Parameters>
           <Parameter Id="Minimum">8</Parameter>
           <Parameter Id="Maximum">20</Parameter>
