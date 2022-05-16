@@ -155,7 +155,7 @@
         <LocalizedStrings>
           <LocalizedString ElementType="ErrorMessage" StringId="UserMessageIfClaimsPrincipalAlreadyExists">You are already registered, please press the back button and sign in instead.</LocalizedString>
           <LocalizedString ElementType="ClaimType" ElementId="password" StringId="DisplayName">Temporary password</LocalizedString>
-          <LocalizedString ElementType="UxElement" StringId="initial_intro">Your new password must be different from previous used password</LocalizedString>
+          <LocalizedString ElementType="UxElement" StringId="initial_intro"></LocalizedString>
           <LocalizedString ElementType="ClaimType" ElementId="reenterPassword" StringId="DisplayName">Confirm new password</LocalizedString>
           <LocalizedString ElementType="ClaimType" ElementId="newPassword" StringId="DisplayName">New password</LocalizedString>
           <LocalizedString ElementType="UxElement" StringId="button_continue">Save</LocalizedString>
