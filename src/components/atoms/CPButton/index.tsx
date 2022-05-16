@@ -3,7 +3,7 @@ import { Button } from '@mui/material';
 import { MouseEventHandler } from 'react';
 
 interface ICPButton {
-	label?: string;
+	label?: string | React.ReactNode;
 	variant?: 'text' | 'outlined' | 'contained';
 	color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
 	startIcon?: React.ReactNode;
