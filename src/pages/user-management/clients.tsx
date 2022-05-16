@@ -10,9 +10,18 @@ import CPButton from 'components/atoms/CPButton';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import SearchIcon from '@mui/icons-material/Search';
 import CPTextField from 'components/atoms/CPTextField';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { useTranslation } from 'react-i18next';
+
+interface IClientForm {
+	name?: string;
+	description: string;
+}
 
 const Clients: NextPage = () => {
 	const [open, setOpen] = React.useState(false);
+	const { t, i18n } = useTranslation();
 
 	const handleOpen = () => {
 		setOpen(true);
@@ -23,27 +32,64 @@ const Clients: NextPage = () => {
 	};
 
 	const handleClose = () => {
+		clientForm.handleReset(clientForm);
 		setOpen(false);
 	};
 	const handleDataExport = () => {
 		alert('not implemented');
 	};
 
+	const validationSchema = yup.object({
+		name: yup.number().required(t('Welcome to React')),
+		description: yup.string().required('name_required')
+	});
+
+	const changeLanguage = (lng: string) => {
+		i18n.changeLanguage(lng);
+	};
+
+	const clientForm = useFormik({
+		initialValues: {
+			name: '',
+			description: ''
+		},
+		validationSchema: validationSchema,
+		onSubmit: (values: IClientForm) => {
+			alert(JSON.stringify(values));
+			handleClose();
+		}
+	});
+
+	const handleSave = () => {
+		clientForm.handleSubmit();
+	};
+
 	const dialogContent = (
-		<Grid container spacing={3} sx={{ marginTop: '10px' }}>
-			<Grid item xs={6}>
-				<CPTextField label="Outlined" />
+		<form onSubmit={clientForm.handleSubmit} onReset={clientForm.handleReset}>
+			<Grid container spacing={3} sx={{ marginTop: '10px' }}>
+				<Grid item xs={6}>
+					<CPTextField
+						label="Name"
+						name="name"
+						onBlur={clientForm.handleBlur}
+						handleChange={clientForm.handleChange}
+						error={clientForm.touched.name && clientForm.errors.name ? true : false}
+						helperText={clientForm.touched.name ? clientForm.errors.name : ''}
+					/>
+				</Grid>
+				<button onClick={() => changeLanguage('fr')}>fr</button>
+				<Grid item xs={6}>
+					<CPTextField
+						label="description"
+						name="description"
+						handleChange={clientForm.handleChange}
+						onBlur={clientForm.handleBlur}
+						error={clientForm.touched.description && clientForm.errors.description ? true : false}
+						helperText={clientForm.touched.description ? clientForm.errors.description : ''}
+					/>
+				</Grid>
 			</Grid>
-			<Grid item xs={6}>
-				<CPTextField label="Filled" />
-			</Grid>
-			<Grid item xs={6}>
-				<CPTextField label="Filled" />
-			</Grid>
-			<Grid item xs={6}>
-				<CPTextField label="Filled" />
-			</Grid>
-		</Grid>
+		</form>
 	);
 
 	return (
@@ -61,7 +107,7 @@ const Clients: NextPage = () => {
 						handleClose={handleClose}
 						actions={
 							<>
-								<Button onClick={handleClose} variant="contained">
+								<Button onClick={handleSave} variant="contained">
 									Close
 								</Button>
 							</>
