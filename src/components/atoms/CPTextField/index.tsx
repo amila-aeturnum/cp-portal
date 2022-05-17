@@ -9,13 +9,27 @@ interface ICPTextField {
 	helperText?: string;
 	handleChange?: (e: ChangeEvent) => void;
 	onBlur?: (e: ChangeEvent) => void;
+	size?: 'small' | 'medium';
+	fullWidth?: boolean;
 }
 
 export default function CPTextField(props: ICPTextField) {
-	const { label, handleChange, error, name, helperText, onBlur } = props;
+	const { label, handleChange, error, name, helperText, onBlur, size, fullWidth } = props;
+	const styles = {
+		inputProps_small: {
+			fontSize: '14px',
+			fontWeight: 400,
+			padding: '2.5px 0px'
+		},
+		inputLabelProps_small: {
+			fontSize: 14,
+			marginTop: '2.5px'
+		}
+	};
+
 	return (
 		<TextField
-			sx={{ width: 318, height: 42 }}
+			// sx={{ width: 318, height: 42 }}
 			id="outlined-basic"
 			label={label}
 			name={name}
@@ -24,6 +38,10 @@ export default function CPTextField(props: ICPTextField) {
 			onBlur={onBlur}
 			onChange={handleChange}
 			helperText={helperText}
+			size={size}
+			fullWidth={fullWidth}
+			InputProps={{ style: size == 'small' ? styles.inputProps_small : {} }}
+			InputLabelProps={{ style: size == 'small' ? styles.inputLabelProps_small : {} }}
 		/>
 	);
 }
