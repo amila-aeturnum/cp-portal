@@ -65,7 +65,7 @@
         <UserHelpText />
         <UserInputType>TextBox</UserInputType>
         <Restriction>
-          <Pattern RegularExpression="^[a-zA-Z0-9.+!#$%&amp;'^_`{}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" HelpText="Please enter a valid email address." />
+          <Pattern RegularExpression="(?=^.{1,255}$)(^[a-zA-Z0-9.+!#$%&amp;'^_`{}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$)" HelpText="Please enter a valid email address." />
         </Restriction>
       </ClaimType>
 
@@ -190,7 +190,7 @@
         <UserHelpText>Email address that can be used to contact you.</UserHelpText>
         <UserInputType>TextBox</UserInputType>
         <Restriction>
-          <Pattern RegularExpression="^[a-zA-Z0-9.+!#$%&amp;'^_`{}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$" HelpText="Please enter a valid email address." />
+          <Pattern RegularExpression="(?=^.{1,255}$)(^[a-zA-Z0-9.+!#$%&amp;'^_`{}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$)" HelpText="Please enter a valid email address." />
         </Restriction>
       </ClaimType>
 
@@ -308,7 +308,7 @@
 
     <Predicates>
       <Predicate Id="LengthRange" Method="IsLengthRange">
-        <UserHelpText>Minimum 8 characters.</UserHelpText>
+        <UserHelpText>Minimum 8 characters &amp; maximum 20 characters</UserHelpText>
         <Parameters>
           <Parameter Id="Minimum">8</Parameter>
           <Parameter Id="Maximum">20</Parameter>
@@ -754,6 +754,7 @@
             <Item Key="setting.operatingMode">Email</Item>
             <Item Key="ContentDefinitionReferenceId">api.localaccountsignin</Item>
             <Item Key="IncludeClaimResolvingInClaimsHandling">true</Item>
+            <Item Key="setting.enableRememberMe">false</Item>
           </Metadata>
           <IncludeInSso>false</IncludeInSso>
           <InputClaims>
