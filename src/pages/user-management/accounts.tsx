@@ -79,30 +79,47 @@ const Accounts: NextPage = () => {
 
 	const dialogContent = (
 		<form onSubmit={clientForm.handleSubmit} onReset={clientForm.handleReset}>
-			<Grid container spacing={3} sx={{ marginTop: '10px' }} rowSpacing={2}>
-				<Grid item xs={12} md={6}>
-					<CPTextField
-						label="Name"
-						name="name"
-						onBlur={clientForm.handleBlur}
-						handleChange={clientForm.handleChange}
-						error={clientForm.touched.name && clientForm.errors.name ? true : false}
-						helperText={clientForm.touched.name ? clientForm.errors.name : ''}
-						size={'small'}
-						fullWidth
-					/>
+			<Grid>
+				<Grid container spacing={3} sx={{ marginTop: '10px' }} rowSpacing={2}>
+					<Grid item xs={12} md={6}></Grid>
+					<Grid item xs={12} md={6}>
+						<CPTextField
+							label="description"
+							name="description"
+							handleChange={clientForm.handleChange}
+							onBlur={clientForm.handleBlur}
+							error={clientForm.touched.description && clientForm.errors.description ? true : false}
+							helperText={clientForm.touched.description ? clientForm.errors.description : ''}
+							size={'small'}
+							fullWidth
+						/>
+					</Grid>
 				</Grid>
-				<Grid item xs={12} md={6}>
-					<CPTextField
-						label="description"
-						name="description"
-						handleChange={clientForm.handleChange}
-						onBlur={clientForm.handleBlur}
-						error={clientForm.touched.description && clientForm.errors.description ? true : false}
-						helperText={clientForm.touched.description ? clientForm.errors.description : ''}
-						size={'small'}
-						fullWidth
-					/>
+				<Grid container spacing={3} sx={{ marginTop: '10px' }} rowSpacing={2}>
+					<Grid item xs={12} md={6}>
+						<CPTextField
+							label="Name"
+							name="name"
+							onBlur={clientForm.handleBlur}
+							handleChange={clientForm.handleChange}
+							error={clientForm.touched.name && clientForm.errors.name ? true : false}
+							helperText={clientForm.touched.name ? clientForm.errors.name : ''}
+							size={'small'}
+							fullWidth
+						/>
+					</Grid>
+					<Grid item xs={12} md={6}>
+						<CPTextField
+							label="description"
+							name="description"
+							handleChange={clientForm.handleChange}
+							onBlur={clientForm.handleBlur}
+							error={clientForm.touched.description && clientForm.errors.description ? true : false}
+							helperText={clientForm.touched.description ? clientForm.errors.description : ''}
+							size={'small'}
+							fullWidth
+						/>
+					</Grid>
 				</Grid>
 			</Grid>
 		</form>

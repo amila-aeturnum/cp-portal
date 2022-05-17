@@ -29,7 +29,6 @@ export default function CPTextField(props: ICPTextField) {
 
 	return (
 		<TextField
-			// sx={{ width: 318, height: 42 }}
 			id="outlined-basic"
 			label={label}
 			name={name}
