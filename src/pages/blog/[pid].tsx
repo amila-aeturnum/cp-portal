@@ -1,28 +1,49 @@
 import { useRouter } from "next/router";
-import { GetStaticPaths, GetStaticProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from "next";
 
-const Post = (props:any) => {
+const Post = () => {
   const router = useRouter();
   const { pid } = router.query;
-   const { sid } = router.query;
+  const { sid } = router.query;
 
-  return <p>Post: {pid} {sid}</p>;
+  return (
+    <p>
+      Post: {pid} {sid}
+    </p>
+  );
 };
 
+interface Ibooks {
+  category:string;
+}
+
+const booksArray: Array<Ibooks> = [
+  {
+    category: "test1"
+  },
+  {
+    category: "test"
+  },
+];
 export const getStaticPaths: GetStaticPaths = async () => {
-    const arr: string[] = ['1','2','3']
-    const paths = arr.map((pid) => {
-        return {
-            params: { pid },
-        }
-    })
-    return { paths }
-}
+  const paths = booksArray.map((book) => ({
+    params: { pid: book.category },
+  }));
 
-export const getStaticProps: GetStaticProps = async (context) => {
-    // This is where the error occurs
-    const { pid } = context.params // Property 'slug' does not exist on type 'ParsedUrlQuery | undefined'
-    return pid;
-}
+  return { paths, fallback: false };
+};
 
+
+
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+  try {
+    const category = params?.pid;
+
+    //const item = booksArray.find((data) => data.category === category);
+
+    return { props: { category } };
+  } catch (err) {
+    return { props: { errors: err.message } };
+  }
+};
 export default Post;
