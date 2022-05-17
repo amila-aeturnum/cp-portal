@@ -13,6 +13,8 @@ import CPTextField from 'components/atoms/CPTextField';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
+import axiosInstance from 'configs/axiosConfig';
 
 interface IClientForm {
 	name?: string;
@@ -22,6 +24,17 @@ interface IClientForm {
 const Clients: NextPage = () => {
 	const [open, setOpen] = React.useState(false);
 	const { t, i18n } = useTranslation();
+
+	useEffect(() => {
+		axiosInstance
+			.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/client-account/all`)
+			.then(function (response) {
+				console.log(response);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	}, []);
 
 	const handleOpen = () => {
 		setOpen(true);
