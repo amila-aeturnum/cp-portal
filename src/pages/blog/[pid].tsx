@@ -42,7 +42,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     //const item = booksArray.find((data) => data.category === category);
 
     return { props: { category } };
-  } catch (err) {
+  } catch (err:any) {
     return { props: { errors: err.message } };
   }
 };
