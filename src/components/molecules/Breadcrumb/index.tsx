@@ -12,10 +12,11 @@ function handleClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
 
 interface IBreadcrumb {
 	title: string;
+	actions?: React.ReactNode;
 }
 
 export default function Breadcrumb(props: IBreadcrumb) {
-	const { title } = props;
+	const { title, actions } = props;
 	const breadcrumbs = [
 		<Link underline="hover" key="1" color="inherit" href="/" onClick={handleClick}>
 			Dashboard
@@ -36,10 +37,15 @@ export default function Breadcrumb(props: IBreadcrumb) {
 
 	return (
 		<Stack sx={{ backgroundColor: '#FFF', marginBottom: 2, padding: 3, borderRadius: 2 }}>
-			<Typography fontSize={24}>{title}</Typography>
-			<Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
-				{breadcrumbs}
-			</Breadcrumbs>
+			<div style={{ display: 'block', width: '100%', flex: '0 0 auto' }}>
+				<div style={{ float: 'left' }}>
+					<Typography fontSize={24}>{title}</Typography>
+					<Breadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb">
+						{breadcrumbs}
+					</Breadcrumbs>
+				</div>
+				<div style={{ float: 'right' }}>{actions}</div>
+			</div>
 		</Stack>
 	);
 }
