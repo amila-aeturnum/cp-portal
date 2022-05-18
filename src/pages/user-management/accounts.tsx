@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import styles from '../../../styles/Home.module.css';
-import * as React from 'react';
+import { useState } from 'react';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import ResponsiveDialog from 'components/molecules/ResponsiveDialog';
 import { Button, Grid, OutlinedInput, InputAdornment } from '@mui/material';
@@ -13,8 +13,8 @@ import CPTextField from 'components/atoms/CPTextField';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
-import axiosInstance from 'configs/axiosConfig';
+import CPSingleSelectDropDown from 'components/atoms/CPSingleSelectDropDown';
+import CPSingleSelectAutoCompleteDropDown from 'components/atoms/CPSingleSelectAutoCompleteDropDown';
 
 interface IClientForm {
 	name?: string;
@@ -22,26 +22,11 @@ interface IClientForm {
 }
 
 const Accounts: NextPage = () => {
-	const [open, setOpen] = React.useState(false);
-	const { t, i18n } = useTranslation();
-
-	useEffect(() => {
-		axiosInstance
-			.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/client-account/all`)
-			.then(function (response) {
-				console.log(response);
-			})
-			.catch((error) => {
-				console.log(error);
-			});
-	}, []);
+	const [open, setOpen] = useState(false);
+	const { t } = useTranslation();
 
 	const handleOpen = () => {
 		setOpen(true);
-	};
-
-	const handleEdit = (data: object) => {
-		alert(JSON.stringify(data));
 	};
 
 	const handleClose = () => {
@@ -57,10 +42,6 @@ const Accounts: NextPage = () => {
 		description: yup.string().required('name_required')
 	});
 
-	const changeLanguage = (lng: string) => {
-		i18n.changeLanguage(lng);
-	};
-
 	const clientForm = useFormik({
 		initialValues: {
 			name: '',
@@ -73,53 +54,44 @@ const Accounts: NextPage = () => {
 		}
 	});
 
-	const handleSave = () => {
-		clientForm.handleSubmit();
-	};
-
 	const dialogContent = (
 		<form onSubmit={clientForm.handleSubmit} onReset={clientForm.handleReset}>
-			<Grid>
-				<Grid container spacing={3} sx={{ marginTop: '10px' }} rowSpacing={2}>
-					<Grid item xs={12} md={6}></Grid>
-					<Grid item xs={12} md={6}>
-						<CPTextField
-							label="description"
-							name="description"
-							handleChange={clientForm.handleChange}
-							onBlur={clientForm.handleBlur}
-							error={clientForm.touched.description && clientForm.errors.description ? true : false}
-							helperText={clientForm.touched.description ? clientForm.errors.description : ''}
-							size={'small'}
-							fullWidth
-						/>
-					</Grid>
+			<Grid container sx={{ marginTop: '10px' }} spacing={3}>
+				<Grid item xs={12} sm={6} md={6}>
+					<CPSingleSelectDropDown
+						options={[{ key: '1', value: 'sss', id: 1 }]}
+						handleChange={() => {}}
+						fullWidth
+						size="small"
+						label="Select"
+					/>
 				</Grid>
-				<Grid container spacing={3} sx={{ marginTop: '10px' }} rowSpacing={2}>
-					<Grid item xs={12} md={6}>
-						<CPTextField
-							label="Name"
-							name="name"
-							onBlur={clientForm.handleBlur}
-							handleChange={clientForm.handleChange}
-							error={clientForm.touched.name && clientForm.errors.name ? true : false}
-							helperText={clientForm.touched.name ? clientForm.errors.name : ''}
-							size={'small'}
-							fullWidth
-						/>
-					</Grid>
-					<Grid item xs={12} md={6}>
-						<CPTextField
-							label="description"
-							name="description"
-							handleChange={clientForm.handleChange}
-							onBlur={clientForm.handleBlur}
-							error={clientForm.touched.description && clientForm.errors.description ? true : false}
-							helperText={clientForm.touched.description ? clientForm.errors.description : ''}
-							size={'small'}
-							fullWidth
-						/>
-					</Grid>
+				<Grid item xs={12} sm={6} md={6}>
+					<CPSingleSelectAutoCompleteDropDown size="small" options={[{ key: '1', value: 'sss', id: 1 }]} label="All" />
+				</Grid>
+				<Grid item xs={12} sm={6} md={6}>
+					<CPTextField
+						label="Name"
+						name="name"
+						onBlur={clientForm.handleBlur}
+						handleChange={clientForm.handleChange}
+						error={clientForm.touched.name && clientForm.errors.name ? true : false}
+						helperText={clientForm.touched.name ? clientForm.errors.name : ''}
+						size={'small'}
+						fullWidth
+					/>
+				</Grid>
+				<Grid item xs={12} sm={6} md={6}>
+					<CPTextField
+						label="description"
+						name="description"
+						handleChange={clientForm.handleChange}
+						onBlur={clientForm.handleBlur}
+						error={clientForm.touched.description && clientForm.errors.description ? true : false}
+						helperText={clientForm.touched.description ? clientForm.errors.description : ''}
+						size={'small'}
+						fullWidth
+					/>
 				</Grid>
 			</Grid>
 		</form>
@@ -140,7 +112,7 @@ const Accounts: NextPage = () => {
 						handleClose={handleClose}
 						actions={
 							<>
-								<CPButton label={'Create user'} variant="contained" />
+								<CPButton label={'Create user'} variant="contained" style={{ padding: '8px 32px' }} />
 							</>
 						}
 					/>
@@ -171,8 +143,6 @@ const Accounts: NextPage = () => {
 							/>
 						</Grid>
 					</Grid>
-
-					<DataTable onEditAction={handleEdit} />
 				</div>
 			</main>
 		</div>
