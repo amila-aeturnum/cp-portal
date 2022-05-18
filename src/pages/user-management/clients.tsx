@@ -13,8 +13,9 @@ import CPTextField from 'components/atoms/CPTextField';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axiosInstance from 'configs/axiosConfig';
+import { IColumn } from 'components/molecules/DataTable/DataTableHeader';
 
 interface IClientForm {
 	name?: string;
@@ -22,19 +23,42 @@ interface IClientForm {
 }
 
 const Clients: NextPage = () => {
-	const [open, setOpen] = React.useState(false);
+	const [open, setOpen] = useState(false);
+	const [clientsList, setClientsList] = useState([]);
 	const { t, i18n } = useTranslation();
+	const [page, setPage] = React.useState<Number>(0);
+	const [rowsPerPage, setRowsPerPage] = React.useState<Number>(3);
 
 	useEffect(() => {
 		axiosInstance
-			.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/client-account/all`)
+			.get(
+				`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/client-account/all?count=${rowsPerPage}&page=${page}`
+			)
 			.then(function (response) {
 				console.log(response);
+				setClientsList(response.data.userAccountList);
 			})
 			.catch((error) => {
 				console.log(error);
 			});
-	}, []);
+	}, [page, rowsPerPage]);
+
+	const columns: IColumn[] = [
+		{ id: 'clientName', label: 'Client Name', minWidth: 170 },
+		{ id: 'email', label: 'Email', minWidth: 100 },
+		{
+			id: 'isConversionRate',
+			label: 'Is ConversionRate',
+			minWidth: 170,
+			align: 'right'
+		},
+		{
+			id: 'isCostPerAcquisition',
+			label: 'Is Cost Per Acquisition',
+			minWidth: 170,
+			align: 'right'
+		}
+	];
 
 	const handleOpen = () => {
 		setOpen(true);
@@ -90,7 +114,6 @@ const Clients: NextPage = () => {
 						helperText={clientForm.touched.name ? clientForm.errors.name : ''}
 					/>
 				</Grid>
-				<button onClick={() => changeLanguage('fr')}>fr</button>
 				<Grid item xs={6}>
 					<CPTextField
 						label="description"
@@ -154,7 +177,15 @@ const Clients: NextPage = () => {
 						</Grid>
 					</Grid>
 
-					<DataTable onEditAction={handleEdit} />
+					<DataTable
+						onEditAction={handleEdit}
+						rows={clientsList}
+						rowsPerPage={rowsPerPage}
+						page={page}
+						columns={columns}
+						setRowsPerPage={setRowsPerPage}
+						setPage={setPage}
+					/>
 				</div>
 			</main>
 		</div>
