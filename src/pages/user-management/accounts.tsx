@@ -39,8 +39,8 @@ const Accounts: NextPage = () => {
 	};
 
 	const validationSchema = yup.object({
-		name: yup.string().required(t('cannot_be_empty')),
-		email: yup.string().required(t('cannot_be_empty')).email()
+		name: yup.string().required(t('value_required')),
+		email: yup.string().required(t('value_required')).email()
 	});
 
 	const clientForm = useFormik({
@@ -66,19 +66,19 @@ const Accounts: NextPage = () => {
 						handleChange={() => {}}
 						fullWidth
 						size="small"
-						label={t('User_type')}
+						label={t('userType')}
 					/>
 				</Grid>
 				<Grid item xs={12} sm={6} md={6}>
 					<CPSingleSelectAutoCompleteDropDown
 						size="small"
 						options={[{ key: '1', value: 'sss', id: 1 }]}
-						label={t('Client')}
+						label={t('client')}
 					/>
 				</Grid>
 				<Grid item xs={12} sm={6} md={6}>
 					<CPTextField
-						label={t('Name')}
+						label={t('name')}
 						name="name"
 						onBlur={clientForm.handleBlur}
 						handleChange={clientForm.handleChange}
@@ -90,7 +90,7 @@ const Accounts: NextPage = () => {
 				</Grid>
 				<Grid item xs={12} sm={6} md={6}>
 					<CPTextField
-						label={t('Email')}
+						label={t('email')}
 						name="email"
 						handleChange={clientForm.handleChange}
 						onBlur={clientForm.handleBlur}

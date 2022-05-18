@@ -15,6 +15,7 @@ axiosInstance.interceptors.request.use(
 		if (token) {
 			return { ...config, headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': true } };
 		}
+		return config;
 	},
 	(error) => {
 		// handle the error
