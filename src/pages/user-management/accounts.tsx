@@ -3,9 +3,8 @@ import styles from '../../../styles/Home.module.css';
 import { useState } from 'react';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import ResponsiveDialog from 'components/molecules/ResponsiveDialog';
-import { Button, Grid, OutlinedInput, InputAdornment } from '@mui/material';
+import { Grid, OutlinedInput, InputAdornment } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import DataTable from 'components/molecules/DataTable';
 import CPButton from 'components/atoms/CPButton';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import SearchIcon from '@mui/icons-material/Search';
@@ -17,8 +16,10 @@ import CPSingleSelectDropDown from 'components/atoms/CPSingleSelectDropDown';
 import CPSingleSelectAutoCompleteDropDown from 'components/atoms/CPSingleSelectAutoCompleteDropDown';
 
 interface IClientForm {
-	name?: string;
-	description: string;
+	name: string;
+	email: string;
+	userType: string;
+	client: string;
 }
 
 const Accounts: NextPage = () => {
@@ -38,14 +39,16 @@ const Accounts: NextPage = () => {
 	};
 
 	const validationSchema = yup.object({
-		name: yup.number().required(t('Welcome to React')),
-		description: yup.string().required('name_required')
+		name: yup.string().required(t('cannot_be_empty')),
+		email: yup.string().required(t('cannot_be_empty')).email()
 	});
 
 	const clientForm = useFormik({
 		initialValues: {
 			name: '',
-			description: ''
+			email: '',
+			userType: '',
+			client: ''
 		},
 		validationSchema: validationSchema,
 		onSubmit: (values: IClientForm) => {
@@ -63,15 +66,19 @@ const Accounts: NextPage = () => {
 						handleChange={() => {}}
 						fullWidth
 						size="small"
-						label="Select"
+						label={t('User_type')}
 					/>
 				</Grid>
 				<Grid item xs={12} sm={6} md={6}>
-					<CPSingleSelectAutoCompleteDropDown size="small" options={[{ key: '1', value: 'sss', id: 1 }]} label="All" />
+					<CPSingleSelectAutoCompleteDropDown
+						size="small"
+						options={[{ key: '1', value: 'sss', id: 1 }]}
+						label={t('Client')}
+					/>
 				</Grid>
 				<Grid item xs={12} sm={6} md={6}>
 					<CPTextField
-						label="Name"
+						label={t('Name')}
 						name="name"
 						onBlur={clientForm.handleBlur}
 						handleChange={clientForm.handleChange}
@@ -83,12 +90,12 @@ const Accounts: NextPage = () => {
 				</Grid>
 				<Grid item xs={12} sm={6} md={6}>
 					<CPTextField
-						label="description"
-						name="description"
+						label={t('Email')}
+						name="email"
 						handleChange={clientForm.handleChange}
 						onBlur={clientForm.handleBlur}
-						error={clientForm.touched.description && clientForm.errors.description ? true : false}
-						helperText={clientForm.touched.description ? clientForm.errors.description : ''}
+						error={clientForm.touched.email && clientForm.errors.email ? true : false}
+						helperText={clientForm.touched.email ? clientForm.errors.email : ''}
 						size={'small'}
 						fullWidth
 					/>
