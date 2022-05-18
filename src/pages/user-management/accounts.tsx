@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import styles from '../../../styles/Home.module.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import ResponsiveDialog from 'components/molecules/ResponsiveDialog';
 import { Grid, OutlinedInput, InputAdornment } from '@mui/material';
@@ -14,6 +14,7 @@ import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import CPSingleSelectDropDown from 'components/atoms/CPSingleSelectDropDown';
 import CPSingleSelectAutoCompleteDropDown from 'components/atoms/CPSingleSelectAutoCompleteDropDown';
+import axiosInstance from 'configs/axiosConfig';
 
 interface IClientForm {
 	name: string;
@@ -25,6 +26,19 @@ interface IClientForm {
 const Accounts: NextPage = () => {
 	const [open, setOpen] = useState(false);
 	const { t } = useTranslation();
+
+	useEffect(() => {
+		if (open) {
+			axiosInstance
+				.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/roles`)
+				.then(function (response) {
+					console.log(response);
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		}
+	}, [open]);
 
 	const handleOpen = () => {
 		setOpen(true);
@@ -39,6 +53,8 @@ const Accounts: NextPage = () => {
 	};
 
 	const validationSchema = yup.object({
+		userType: yup.string().required(t('value_required')),
+		client: yup.string().required(t('value_required')),
 		name: yup.string().required(t('value_required')),
 		email: yup.string().required(t('value_required')).email()
 	});
@@ -53,7 +69,7 @@ const Accounts: NextPage = () => {
 		validationSchema: validationSchema,
 		onSubmit: (values: IClientForm) => {
 			alert(JSON.stringify(values));
-			handleClose();
+			// handleClose();
 		}
 	});
 
@@ -62,18 +78,27 @@ const Accounts: NextPage = () => {
 			<Grid container sx={{ marginTop: '10px' }} spacing={3}>
 				<Grid item xs={12} sm={6} md={6}>
 					<CPSingleSelectDropDown
-						options={[{ key: '1', value: 'sss', id: 1 }]}
-						handleChange={() => {}}
+						name="userType"
+						options={[{ key: '1', value: 'sss', id: '1' }]}
 						fullWidth
 						size="small"
 						label={t('userType')}
+						onBlur={clientForm.handleBlur}
+						setFieldValue={clientForm.setFieldValue}
+						error={clientForm.touched.userType && clientForm.errors.userType ? true : false}
+						helperText={clientForm.touched.userType ? clientForm.errors.userType : ''}
 					/>
 				</Grid>
 				<Grid item xs={12} sm={6} md={6}>
 					<CPSingleSelectAutoCompleteDropDown
+						name="client"
 						size="small"
 						options={[{ key: '1', value: 'sss', id: 1 }]}
 						label={t('client')}
+						onBlur={clientForm.handleBlur}
+						setFieldValue={clientForm.setFieldValue}
+						error={clientForm.touched.client && clientForm.errors.client ? true : false}
+						helperText={clientForm.touched.client ? clientForm.errors.client : ''}
 					/>
 				</Grid>
 				<Grid item xs={12} sm={6} md={6}>
@@ -119,7 +144,12 @@ const Accounts: NextPage = () => {
 						handleClose={handleClose}
 						actions={
 							<>
-								<CPButton label={'Create user'} variant="contained" style={{ padding: '8px 32px' }} />
+								<CPButton
+									label={'Create user'}
+									variant="contained"
+									style={{ padding: '8px 32px' }}
+									onClick={clientForm.submitForm}
+								/>
 							</>
 						}
 					/>
