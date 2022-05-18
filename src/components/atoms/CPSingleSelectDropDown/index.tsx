@@ -1,41 +1,46 @@
 import * as React from 'react';
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { ChangeEvent } from 'react';
 
 interface ICPSingleSelectDropDown {
 	options: OptionItem[];
 	label?: string;
-	handleChange: (text: string) => void;
 	fullWidth?: boolean;
 	size?: 'small' | 'medium';
+	error?: boolean | undefined;
+	helperText?: string;
+	setFieldValue: (field: string, value: any, shouldValidate?: boolean | undefined) => void;
+	onBlur?: (e: ChangeEvent) => void;
+	name: string;
+	id?: string | undefined;
 }
 interface OptionItem {
 	key: string;
 	value: string;
-	id: number;
+	id: string;
 }
 export default function CPSingleSelectDropDown(props: ICPSingleSelectDropDown) {
 	const [age, setAge] = React.useState('');
-	const { label, options, fullWidth, size } = props;
-	const handleChange = (event: SelectChangeEvent) => {
-		setAge(event.target.value as string);
-	};
+	const { label, options, fullWidth, size, name, helperText, error, setFieldValue, id, onBlur } = props;
 
 	return (
-		<FormControl fullWidth={fullWidth} size={size}>
-			<InputLabel id="demo-simple-select-label">{label}</InputLabel>
+		<FormControl fullWidth={fullWidth} size={size} error={error}>
+			<InputLabel id={id}>{label}</InputLabel>
 			<Select
-				labelId="demo-simple-select-label"
-				id="demo-simple-select"
-				value={age}
 				label={label}
-				onChange={handleChange}
+				onChange={(e) => {
+					setFieldValue(name, e.target.value);
+				}}
+				onBlur={onBlur}
+				name={name}
 			>
 				{Object.values(options).map((option) => (
-					<MenuItem key="option.key" value={option.value}>
+					<MenuItem key={option.key} value={option.id}>
 						{option.value}
 					</MenuItem>
 				))}
 			</Select>
+			<FormHelperText>{helperText}</FormHelperText>
 		</FormControl>
 	);
 }
