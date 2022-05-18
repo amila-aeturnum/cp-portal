@@ -22,14 +22,14 @@ export default function ResponsiveDialog(props: IResponsiveDialog) {
 	return (
 		<React.Fragment>
 			<Dialog fullWidth={fullWidth} title={title} maxWidth={maxWidth} open={open} onClose={handleClose}>
-				<DialogTitle sx={{ fontSize: 24, fontWeight: 500 }}>
+				<DialogTitle sx={{ fontSize: 24, fontWeight: 500, paddingInline: '36px', paddingTop: '36px' }}>
 					{title}
 					<IconButton onClick={handleClose} sx={{ float: 'right' }}>
 						<CloseIcon />
 					</IconButton>
 				</DialogTitle>
-				<DialogContent>{content}</DialogContent>
-				<DialogActions>{actions}</DialogActions>
+				<DialogContent sx={{ height: '500px', padding: '0px 36px 36px' }}>{content}</DialogContent>
+				<DialogActions sx={{ padding: '32px' }}>{actions}</DialogActions>
 			</Dialog>
 		</React.Fragment>
 	);

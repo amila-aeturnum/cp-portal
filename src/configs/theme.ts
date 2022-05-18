@@ -79,6 +79,44 @@ export const theme = createTheme({
 					},
 				}
 			]
+		},
+		MuiAutocomplete:{
+			variants:[
+				{
+					props: { size:'small'},
+					style:{
+						input: {
+							fontWeight:400,
+							fontSize:'14px'
+						  },
+						  label:{
+							fontWeight:400,
+							fontSize:'14px'
+						  }, 
+					},
+					
+				}
+			]
+		},
+		MuiFormControl:{
+			variants:[
+				{
+					props: { size:'small'},
+					style:{
+						input: {
+							fontWeight:400,
+							fontSize:'14px',
+							height: '23px'
+						  },
+						  label:{
+							fontWeight:400,
+							fontSize:'14px',
+							paddingTop: '1px'
+						  }, 
+					},
+					
+				}
+			]
 		}
 	},
 	typography: {

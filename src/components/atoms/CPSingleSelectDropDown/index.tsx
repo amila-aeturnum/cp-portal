@@ -5,6 +5,8 @@ interface ICPSingleSelectDropDown {
 	options: OptionItem[];
 	label?: string;
 	handleChange: (text: string) => void;
+	fullWidth?: boolean;
+	size?: 'small' | 'medium';
 }
 interface OptionItem {
 	key: string;
@@ -13,12 +15,13 @@ interface OptionItem {
 }
 export default function CPSingleSelectDropDown(props: ICPSingleSelectDropDown) {
 	const [age, setAge] = React.useState('');
-	const { label, options } = props;
+	const { label, options, fullWidth, size } = props;
 	const handleChange = (event: SelectChangeEvent) => {
 		setAge(event.target.value as string);
 	};
+
 	return (
-		<FormControl sx={{ width: 318, height: 42 }}>
+		<FormControl fullWidth={fullWidth} size={size}>
 			<InputLabel id="demo-simple-select-label">{label}</InputLabel>
 			<Select
 				labelId="demo-simple-select-label"
