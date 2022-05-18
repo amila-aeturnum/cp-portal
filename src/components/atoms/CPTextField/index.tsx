@@ -15,18 +15,6 @@ interface ICPTextField {
 
 export default function CPTextField(props: ICPTextField) {
 	const { label, handleChange, error, name, helperText, onBlur, size, fullWidth } = props;
-	// const styles = {
-	// 	inputProps_small: {
-	// 		fontSize: '14px',
-	// 		fontWeight: 400,
-	// 		padding: '2.5px 0px'
-	// 	},
-	// 	inputLabelProps_small: {
-	// 		fontSize: 14,
-	// 		fontWeight: 400,
-	// 		marginTop: '2.5px'
-	// 	}
-	// };
 
 	return (
 		<TextField
@@ -40,8 +28,6 @@ export default function CPTextField(props: ICPTextField) {
 			helperText={helperText}
 			size={size}
 			fullWidth={fullWidth}
-			// InputProps={{ style: size == 'small' ? styles.inputProps_small : {} }}
-			// InputLabelProps={{ style: size == 'small' ? styles.inputLabelProps_small : {} }}
 		/>
 	);
 }
