@@ -28,8 +28,8 @@ export default function ResponsiveDialog(props: IResponsiveDialog) {
 						<CloseIcon />
 					</IconButton>
 				</DialogTitle>
-				<DialogContent style={{ height: '500px', padding: '0px 36px 36px' }}>{content}</DialogContent>
-				<DialogActions style={{ padding: '32px' }}>{actions}</DialogActions>
+				<DialogContent sx={{ height: '500px', padding: '0px 36px 36px' }}>{content}</DialogContent>
+				<DialogActions sx={{ padding: '32px' }}>{actions}</DialogActions>
 			</Dialog>
 		</React.Fragment>
 	);
