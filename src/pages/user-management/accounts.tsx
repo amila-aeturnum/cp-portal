@@ -18,21 +18,24 @@ import axiosInstance from 'configs/axiosConfig';
 import { IRoleList } from 'types/userRole.types';
 import { IOptionItem } from 'interfaces/optionItem.interface';
 import { toFirstLetterCapital } from 'utils/helpers';
+import { IUserAccountList } from 'types/userAccountList.type';
 
 interface IClientForm {
 	fullName: string;
 	email: string;
 	userRole: string;
-	client: string;
+	clientAccountId: string;
 }
 
 const Accounts: NextPage = () => {
 	const [open, setOpen] = useState(false);
 	const [userTypes, setUserTypes] = useState<IOptionItem[] | []>([]);
 	const [isLoadingUserTypes, setIsLoadingUserTypes] = useState<boolean>(false);
+	const [clients, setClients] = useState<IOptionItem[] | []>([]);
+	const [isLoadingClientList, setIsLoadingClientList] = useState<boolean>(false);
 	const [isAnalyst, setIsAnalyst] = useState<Boolean | null>(null);
 	const { t } = useTranslation();
-
+	// get user roles
 	useEffect(() => {
 		if (open) {
 			setIsLoadingUserTypes(true);
@@ -49,6 +52,26 @@ const Accounts: NextPage = () => {
 				.catch((error) => {
 					console.log(error);
 					setIsLoadingUserTypes(false);
+				});
+		}
+	}, [open]);
+	// get client list
+	useEffect(() => {
+		if (open) {
+			setIsLoadingClientList(true);
+			axiosInstance
+				.get<IUserAccountList>(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/client-account/list`)
+				.then(function (response) {
+					var clients: IOptionItem[] = [];
+					response.data.userAccountList?.forEach((value) => {
+						clients.push({ value: value.id, label: toFirstLetterCapital(value.clientName) });
+					});
+					setClients(clients);
+					setIsLoadingClientList(false);
+				})
+				.catch((error) => {
+					console.log(error);
+					setIsLoadingClientList(false);
 				});
 		}
 	}, [open]);
@@ -83,7 +106,7 @@ const Accounts: NextPage = () => {
 		axiosInstance
 			.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/create`, client)
 			.then(function (response) {
-				console.log(response);
+				handleClose();
 			})
 			.catch((error) => {
 				console.log(error);
@@ -100,7 +123,7 @@ const Accounts: NextPage = () => {
 	} else {
 		validationSchemaConditional = yup.object({
 			userRole: yup.string().required(t('value_required')),
-			client: yup.string().required(t('value_required')),
+			clientAccountId: yup.string().required(t('value_required')),
 			fullName: yup.string().required(t('value_required')),
 			email: yup.string().required(t('value_required')).max(255, t('invalid_email')).email(t('invalid_email'))
 		});
@@ -113,14 +136,11 @@ const Accounts: NextPage = () => {
 			fullName: '',
 			email: '',
 			userRole: '',
-			client: ''
+			clientAccountId: ''
 		},
 		validationSchema: validationSchema,
 		onSubmit: (values: IClientForm) => {
-			alert('ss');
-			console.log(JSON.stringify(values));
 			createAccount(values);
-			// handleClose();
 		}
 	});
 
@@ -144,14 +164,14 @@ const Accounts: NextPage = () => {
 				{isAnalyst ? null : (
 					<Grid item xs={12} sm={6} md={6}>
 						<CPSingleSelectAutoCompleteDropDown
-							name="client"
+							name="clientAccountId"
 							size="small"
-							options={[{ key: '1', value: 'sss', id: 1 }]}
+							options={clients}
 							label={t('client')}
 							onBlur={clientForm.handleBlur}
 							setFieldValue={clientForm.setFieldValue}
-							error={clientForm.touched.client && clientForm.errors.client ? true : false}
-							helperText={clientForm.touched.client ? clientForm.errors.client : ''}
+							error={clientForm.touched.clientAccountId && clientForm.errors.clientAccountId ? true : false}
+							helperText={clientForm.touched.clientAccountId ? clientForm.errors.clientAccountId : ''}
 						/>
 					</Grid>
 				)}
