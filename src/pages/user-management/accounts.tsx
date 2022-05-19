@@ -19,6 +19,7 @@ import { IRoleList } from 'types/userRole.types';
 import { IOptionItem } from 'interfaces/optionItem.interface';
 import { toFirstLetterCapital } from 'utils/helpers';
 import { IUserAccountList } from 'types/userAccountList.type';
+import CPLoadingButton from 'components/atoms/CPLoadingButton';
 
 interface IClientForm {
 	fullName: string;
@@ -34,6 +35,7 @@ const Accounts: NextPage = () => {
 	const [clients, setClients] = useState<IOptionItem[] | []>([]);
 	const [isLoadingClientList, setIsLoadingClientList] = useState<boolean>(false);
 	const [isAnalyst, setIsAnalyst] = useState<Boolean | null>(null);
+	const [isCreatingAccount, setIsCreatingAccount] = useState<boolean>(false);
 	const { t } = useTranslation();
 	// get user roles
 	useEffect(() => {
@@ -103,13 +105,16 @@ const Accounts: NextPage = () => {
 	};
 
 	const createAccount = (client: IClientForm) => {
+		setIsCreatingAccount(true);
 		axiosInstance
 			.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/create`, client)
 			.then(function (response) {
 				handleClose();
+				setIsCreatingAccount(false);
 			})
 			.catch((error) => {
 				console.log(error);
+				setIsCreatingAccount(false);
 			});
 	};
 
@@ -220,12 +225,13 @@ const Accounts: NextPage = () => {
 						handleClose={handleClose}
 						actions={
 							<>
-								<CPButton
+								<CPLoadingButton
 									label={'Create user'}
 									variant="contained"
 									style={{ padding: '8px 32px' }}
 									onClick={clientForm.submitForm}
 									disabled={!(clientForm.isValid && clientForm.dirty)}
+									loading={isCreatingAccount}
 								/>
 							</>
 						}
