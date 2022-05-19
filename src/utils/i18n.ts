@@ -10,7 +10,8 @@ const resources = {
 			client: 'Client',
 			email: 'Email',
 			value_required: 'Value Required',
-			name: 'Name'
+			name: 'Name',
+			invalid_email: 'Invalid email address'
 		}
 	},
 	fr: {

@@ -3,7 +3,7 @@ import styles from '../../../styles/Home.module.css';
 import { useState, useEffect } from 'react';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import ResponsiveDialog from 'components/molecules/ResponsiveDialog';
-import { Grid, OutlinedInput, InputAdornment } from '@mui/material';
+import { Grid, OutlinedInput, InputAdornment, SelectChangeEvent, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CPButton from 'components/atoms/CPButton';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
@@ -15,30 +15,56 @@ import { useTranslation } from 'react-i18next';
 import CPSingleSelectDropDown from 'components/atoms/CPSingleSelectDropDown';
 import CPSingleSelectAutoCompleteDropDown from 'components/atoms/CPSingleSelectAutoCompleteDropDown';
 import axiosInstance from 'configs/axiosConfig';
+import { IRoleList } from 'types/userRole.types';
+import { IOptionItem } from 'interfaces/optionItem.interface';
+import { toFirstLetterCapital } from 'utils/helpers';
 
 interface IClientForm {
-	name: string;
+	fullName: string;
 	email: string;
-	userType: string;
+	userRole: string;
 	client: string;
 }
 
 const Accounts: NextPage = () => {
 	const [open, setOpen] = useState(false);
+	const [userTypes, setUserTypes] = useState<IOptionItem[] | []>([]);
+	const [isLoadingUserTypes, setIsLoadingUserTypes] = useState<boolean>(false);
+	const [isAnalyst, setIsAnalyst] = useState<Boolean | null>(null);
 	const { t } = useTranslation();
 
 	useEffect(() => {
 		if (open) {
+			setIsLoadingUserTypes(true);
 			axiosInstance
-				.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/roles`)
+				.get<IRoleList>(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/roles`)
 				.then(function (response) {
-					console.log(response);
+					var mapUserTypes: IOptionItem[] = [];
+					response.data.roleList?.forEach((value) => {
+						mapUserTypes.push({ value: value.roleId, label: toFirstLetterCapital(value.roleName) });
+					});
+					setUserTypes(mapUserTypes);
+					setIsLoadingUserTypes(false);
 				})
 				.catch((error) => {
 					console.log(error);
+					setIsLoadingUserTypes(false);
 				});
 		}
 	}, [open]);
+	const onUserTypeChange = (e: SelectChangeEvent<string>) => {
+		if (userTypes.length == 0) {
+			console.log('always 0');
+			return;
+		}
+		let userType = e.target.value;
+		clientForm.setFieldValue(e.target.name, userType);
+		if (userTypes.find((element) => element.value.toString() == userType)?.label === 'Analyst') {
+			setIsAnalyst(true);
+		} else {
+			setIsAnalyst(false);
+		}
+	};
 
 	const handleOpen = () => {
 		setOpen(true);
@@ -46,29 +72,54 @@ const Accounts: NextPage = () => {
 
 	const handleClose = () => {
 		clientForm.handleReset(clientForm);
+		setIsAnalyst(null);
 		setOpen(false);
 	};
 	const handleDataExport = () => {
 		alert('not implemented');
 	};
 
-	const validationSchema = yup.object({
-		userType: yup.string().required(t('value_required')),
-		client: yup.string().required(t('value_required')),
-		name: yup.string().required(t('value_required')),
-		email: yup.string().required(t('value_required')).email()
-	});
+	const createAccount = (client: IClientForm) => {
+		axiosInstance
+			.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/create`, client)
+			.then(function (response) {
+				console.log(response);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	};
+
+	let validationSchemaConditional: any;
+	if (isAnalyst) {
+		validationSchemaConditional = yup.object({
+			userRole: yup.string().required(t('value_required')),
+			fullName: yup.string().required(t('value_required')),
+			email: yup.string().required(t('value_required')).email()
+		});
+	} else {
+		validationSchemaConditional = yup.object({
+			userRole: yup.string().required(t('value_required')),
+			client: yup.string().required(t('value_required')),
+			fullName: yup.string().required(t('value_required')),
+			email: yup.string().required(t('value_required')).max(255, t('invalid_email')).email(t('invalid_email'))
+		});
+	}
+
+	const validationSchema = validationSchemaConditional;
 
 	const clientForm = useFormik({
 		initialValues: {
-			name: '',
+			fullName: '',
 			email: '',
-			userType: '',
+			userRole: '',
 			client: ''
 		},
 		validationSchema: validationSchema,
 		onSubmit: (values: IClientForm) => {
-			alert(JSON.stringify(values));
+			alert('ss');
+			console.log(JSON.stringify(values));
+			createAccount(values);
 			// handleClose();
 		}
 	});
@@ -78,37 +129,40 @@ const Accounts: NextPage = () => {
 			<Grid container sx={{ marginTop: '10px' }} spacing={3}>
 				<Grid item xs={12} sm={6} md={6}>
 					<CPSingleSelectDropDown
-						name="userType"
-						options={[{ key: '1', value: 'sss', id: '1' }]}
+						name="userRole"
+						options={userTypes}
 						fullWidth
 						size="small"
 						label={t('userType')}
 						onBlur={clientForm.handleBlur}
-						setFieldValue={clientForm.setFieldValue}
-						error={clientForm.touched.userType && clientForm.errors.userType ? true : false}
-						helperText={clientForm.touched.userType ? clientForm.errors.userType : ''}
+						error={clientForm.touched.userRole && clientForm.errors.userRole ? true : false}
+						helperText={clientForm.touched.userRole ? clientForm.errors.userRole : ''}
+						onChange={onUserTypeChange}
+						disabled={isLoadingUserTypes}
 					/>
 				</Grid>
-				<Grid item xs={12} sm={6} md={6}>
-					<CPSingleSelectAutoCompleteDropDown
-						name="client"
-						size="small"
-						options={[{ key: '1', value: 'sss', id: 1 }]}
-						label={t('client')}
-						onBlur={clientForm.handleBlur}
-						setFieldValue={clientForm.setFieldValue}
-						error={clientForm.touched.client && clientForm.errors.client ? true : false}
-						helperText={clientForm.touched.client ? clientForm.errors.client : ''}
-					/>
-				</Grid>
+				{isAnalyst ? null : (
+					<Grid item xs={12} sm={6} md={6}>
+						<CPSingleSelectAutoCompleteDropDown
+							name="client"
+							size="small"
+							options={[{ key: '1', value: 'sss', id: 1 }]}
+							label={t('client')}
+							onBlur={clientForm.handleBlur}
+							setFieldValue={clientForm.setFieldValue}
+							error={clientForm.touched.client && clientForm.errors.client ? true : false}
+							helperText={clientForm.touched.client ? clientForm.errors.client : ''}
+						/>
+					</Grid>
+				)}
 				<Grid item xs={12} sm={6} md={6}>
 					<CPTextField
 						label={t('name')}
-						name="name"
+						name="fullName"
 						onBlur={clientForm.handleBlur}
 						handleChange={clientForm.handleChange}
-						error={clientForm.touched.name && clientForm.errors.name ? true : false}
-						helperText={clientForm.touched.name ? clientForm.errors.name : ''}
+						error={clientForm.touched.fullName && clientForm.errors.fullName ? true : false}
+						helperText={clientForm.touched.fullName ? clientForm.errors.fullName : ''}
 						size={'small'}
 						fullWidth
 					/>
