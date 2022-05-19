@@ -77,12 +77,12 @@ const Accounts: NextPage = () => {
 	}, [open]);
 	const onUserTypeChange = (e: SelectChangeEvent<string>) => {
 		if (userTypes.length == 0) {
-			console.log('always 0');
 			return;
 		}
 		let userType = e.target.value;
 		clientForm.setFieldValue(e.target.name, userType);
 		if (userTypes.find((element) => element.value.toString() == userType)?.label === 'Analyst') {
+			clientForm.setFieldValue('clientAccountId', '');
 			setIsAnalyst(true);
 		} else {
 			setIsAnalyst(false);
@@ -172,6 +172,8 @@ const Accounts: NextPage = () => {
 							setFieldValue={clientForm.setFieldValue}
 							error={clientForm.touched.clientAccountId && clientForm.errors.clientAccountId ? true : false}
 							helperText={clientForm.touched.clientAccountId ? clientForm.errors.clientAccountId : ''}
+							loading={isLoadingClientList}
+							disableClearable
 						/>
 					</Grid>
 				)}
@@ -223,6 +225,7 @@ const Accounts: NextPage = () => {
 									variant="contained"
 									style={{ padding: '8px 32px' }}
 									onClick={clientForm.submitForm}
+									disabled={!(clientForm.isValid && clientForm.dirty)}
 								/>
 							</>
 						}
