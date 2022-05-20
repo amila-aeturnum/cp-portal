@@ -5,8 +5,16 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
 	en: {
 		translation: {
+			'Welcome to React': 'Welcome to React and react-i18next',
+			userType: "User type",
+			client: 'Client',
+			email: 'Email',
 			value_required: 'Value Required',
-			name: 'Name'
+			name: 'Name',
+			invalid_email: 'Invalid email address',
+			error: 'Error',
+			successful: 'Successful',
+			new_user_account_created:'New user account has been created.'
 		}
 	},
 	fr: {

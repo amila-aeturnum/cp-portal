@@ -11,7 +11,10 @@ import { forgotPasswordRequest, msalConfig } from 'configs/azureConfig';
 import { AuthError, EventType, PublicClientApplication } from '@azure/msal-browser';
 import { InteractionType } from '@azure/msal-browser';
 import MsalErrorCode from 'common/enums/msalErrorCode';
+import { SnackbarProvider } from 'notistack';
 import '../utils/i18n';
+import CPSnackbar from 'components/atoms/CPSnackbar';
+import { Slide } from '@mui/material';
 
 function MyApp({ Component, pageProps }: AppProps) {
 	const [loading, setLoading] = useState(false);
@@ -45,13 +48,23 @@ function MyApp({ Component, pageProps }: AppProps) {
 	return (
 		<MsalProvider instance={msalInstance}>
 			<ThemeProvider theme={theme}>
-				<Layout>
-					<MsalAuthenticationTemplate interactionType={InteractionType.Redirect}>
-						<AuthenticatedTemplate>
-							<div>{!loading ? <Component {...pageProps} /> : <Loader />}</div>
-						</AuthenticatedTemplate>
-					</MsalAuthenticationTemplate>
-				</Layout>
+				<SnackbarProvider
+					anchorOrigin={{
+						vertical: 'top',
+						horizontal: 'right'
+					}}
+					TransitionComponent={Slide}
+					maxSnack={4}
+					content={(key, message) => <CPSnackbar key={key} content={message} />}
+				>
+					<Layout>
+						<MsalAuthenticationTemplate interactionType={InteractionType.Redirect}>
+							<AuthenticatedTemplate>
+								<div>{!loading ? <Component {...pageProps} /> : <Loader />}</div>
+							</AuthenticatedTemplate>
+						</MsalAuthenticationTemplate>
+					</Layout>
+				</SnackbarProvider>
 			</ThemeProvider>
 		</MsalProvider>
 	);
