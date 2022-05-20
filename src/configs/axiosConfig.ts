@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getAuthToken } from 'utils/localStorageUtil';
 
 const axiosInstance = axios.create({
-	baseURL: '',
+	baseURL: process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL,
 	headers: {
 		'Content-type': 'application/json',
 		'Access-Control-Allow-Origin': true
@@ -11,11 +11,9 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
 	(config) => {
-		const token = getAuthToken();
+		const token = true;
 		if (!token) {
-			return { ...config, 
-				 headers: { Authorization: `Bearer ${token}`,
-				 'Access-Control-Allow-Origin': true } };
+			return { ...config, headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': true } };
 		}
 		return config;
 	},

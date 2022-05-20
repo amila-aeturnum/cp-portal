@@ -1,11 +1,10 @@
 import type { NextPage } from 'next';
 import styles from '../../../styles/Home.module.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import ResponsiveDialog from 'components/molecules/ResponsiveDialog';
-import { Button, Grid, OutlinedInput, InputAdornment } from '@mui/material';
+import { Grid, OutlinedInput, InputAdornment, SelectChangeEvent } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import DataTable from 'components/molecules/DataTable';
 import CPButton from 'components/atoms/CPButton';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import SearchIcon from '@mui/icons-material/Search';
@@ -15,15 +14,87 @@ import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import CPSingleSelectDropDown from 'components/atoms/CPSingleSelectDropDown';
 import CPSingleSelectAutoCompleteDropDown from 'components/atoms/CPSingleSelectAutoCompleteDropDown';
-
+import axiosInstance from 'configs/axiosConfig';
+import { IRoleList } from 'types/userRole.types';
+import { IOptionItem } from 'interfaces/optionItem.interface';
+import { toFirstLetterCapital } from 'utils/helpers';
+import { IUserAccountList } from 'types/userAccountList.type';
+import CPLoadingButton from 'components/atoms/CPLoadingButton';
+import { useSnackbar } from 'notistack';
+import CPAlert from 'components/atoms/CPAlert';
+import { getReadableError } from 'utils/errorHelper';
 interface IClientForm {
-	name?: string;
-	description: string;
+	fullName: string;
+	email: string;
+	userRole: string;
+	clientAccountId: string;
 }
 
 const Accounts: NextPage = () => {
 	const [open, setOpen] = useState(false);
+	const [userTypes, setUserTypes] = useState<IOptionItem[] | []>([]);
+	const [isLoadingUserTypes, setIsLoadingUserTypes] = useState<boolean>(false);
+	const [clients, setClients] = useState<IOptionItem[] | []>([]);
+	const [isLoadingClientList, setIsLoadingClientList] = useState<boolean>(false);
+	const [isAnalyst, setIsAnalyst] = useState<Boolean | null>(null);
+	const [isCreatingAccount, setIsCreatingAccount] = useState<boolean>(false);
 	const { t } = useTranslation();
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+	// get user roles
+	useEffect(() => {
+		if (open) {
+			setIsLoadingUserTypes(true);
+			axiosInstance
+				.get<IRoleList>(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/roles`)
+				.then(function (response) {
+					var mapUserTypes: IOptionItem[] = [];
+					response.data.roleList?.forEach((value) => {
+						mapUserTypes.push({ value: value.roleId, label: toFirstLetterCapital(value.roleName) });
+					});
+					setUserTypes(mapUserTypes);
+					setIsLoadingUserTypes(false);
+				})
+				.catch((error) => {
+					let message = getReadableError(error);
+					enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
+					setIsLoadingUserTypes(false);
+				});
+		}
+	}, [open]);
+	// get client list
+	useEffect(() => {
+		if (open) {
+			setIsLoadingClientList(true);
+			axiosInstance
+				.get<IUserAccountList>(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/client-account/list`)
+				.then(function (response) {
+					var clients: IOptionItem[] = [];
+					response.data.userAccountList?.forEach((value) => {
+						clients.push({ value: value.id, label: toFirstLetterCapital(value.clientName) });
+					});
+					setClients(clients);
+					setIsLoadingClientList(false);
+				})
+				.catch((error) => {
+					let message = getReadableError(error);
+					enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
+					setIsLoadingClientList(false);
+				});
+		}
+	}, [open]);
+	const onUserTypeChange = (e: SelectChangeEvent<string>) => {
+		if (userTypes.length == 0) {
+			return;
+		}
+		let userType = e.target.value;
+		clientForm.setFieldValue(e.target.name, userType);
+		if (userTypes.find((element) => element.value.toString() == userType)?.label === 'Analyst') {
+			clientForm.setFieldValue('clientAccountId', '');
+			setIsAnalyst(true);
+		} else {
+			setIsAnalyst(false);
+		}
+	};
 
 	const handleOpen = () => {
 		setOpen(true);
@@ -31,66 +102,128 @@ const Accounts: NextPage = () => {
 
 	const handleClose = () => {
 		clientForm.handleReset(clientForm);
+		setIsAnalyst(null);
 		setOpen(false);
 	};
 	const handleDataExport = () => {
 		alert('not implemented');
 	};
 
-	const validationSchema = yup.object({
-		name: yup.number().required(t('Welcome to React')),
-		description: yup.string().required('name_required')
-	});
+	const createAccount = (client: IClientForm) => {
+		setIsCreatingAccount(true);
+		axiosInstance
+			.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/create`, client)
+			.then(function (response) {
+				enqueueSnackbar(
+					<CPAlert title={t('successful')} message={t('new_user_account_created')} severity={'success'} />
+				);
+				handleClose();
+				setIsCreatingAccount(false);
+			})
+			.catch((error) => {
+				let message = getReadableError(error);
+				enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
+				setIsCreatingAccount(false);
+			});
+	};
+
+	let validationSchemaConditional: any;
+	if (isAnalyst) {
+		validationSchemaConditional = yup.object({
+			userRole: yup.string().required(t('value_required')),
+			fullName: yup.string().max(255, t('invalid_name')).required(t('value_required')).trim(),
+			email: yup.string().required(t('value_required')).max(255, t('invalid_email')).email(t('invalid_email')).trim()
+		});
+	} else {
+		validationSchemaConditional = yup.object({
+			userRole: yup.string().required(t('value_required')),
+			clientAccountId: yup.string().required(t('value_required')),
+			fullName: yup.string().max(255, t('invalid_name')).required(t('value_required')).trim(),
+			email: yup.string().required(t('value_required')).max(255, t('invalid_email')).email(t('invalid_email')).trim()
+		});
+	}
+
+	const validationSchema = validationSchemaConditional;
 
 	const clientForm = useFormik({
 		initialValues: {
-			name: '',
-			description: ''
+			fullName: '',
+			email: '',
+			userRole: '',
+			clientAccountId: ''
 		},
 		validationSchema: validationSchema,
 		onSubmit: (values: IClientForm) => {
-			alert(JSON.stringify(values));
-			handleClose();
+			const castValues = validationSchema.cast(values);
+			createAccount(castValues);
 		}
 	});
 
 	const dialogContent = (
-		<form onSubmit={clientForm.handleSubmit} onReset={clientForm.handleReset}>
+		<form
+			onSubmit={clientForm.handleSubmit}
+			onReset={clientForm.handleReset}
+			onBlur={() => {
+				// format inputs
+				clientForm.values.fullName = clientForm.values.fullName.trim();
+				clientForm.values.email = clientForm.values.email.trim();
+			}}
+		>
 			<Grid container sx={{ marginTop: '10px' }} spacing={3}>
 				<Grid item xs={12} sm={6} md={6}>
 					<CPSingleSelectDropDown
-						options={[{ key: '1', value: 'sss', id: 1 }]}
-						handleChange={() => {}}
+						name="userRole"
+						options={userTypes}
 						fullWidth
 						size="small"
-						label="Select"
+						label={t('userType')}
+						onBlur={clientForm.handleBlur}
+						error={clientForm.touched.userRole && clientForm.errors.userRole ? true : false}
+						helperText={clientForm.touched.userRole ? clientForm.errors.userRole : ''}
+						onChange={onUserTypeChange}
+						disabled={isLoadingUserTypes}
+					/>
+				</Grid>
+				{isAnalyst ? null : (
+					<Grid item xs={12} sm={6} md={6}>
+						<CPSingleSelectAutoCompleteDropDown
+							name="clientAccountId"
+							size="small"
+							options={clients}
+							label={t('client')}
+							onBlur={clientForm.handleBlur}
+							setFieldValue={clientForm.setFieldValue}
+							error={clientForm.touched.clientAccountId && clientForm.errors.clientAccountId ? true : false}
+							helperText={clientForm.touched.clientAccountId ? clientForm.errors.clientAccountId : ''}
+							loading={isLoadingClientList}
+							disableClearable
+						/>
+					</Grid>
+				)}
+				<Grid item xs={12} sm={6} md={6}>
+					<CPTextField
+						label={t('name')}
+						name="fullName"
+						onBlur={clientForm.handleBlur}
+						handleChange={clientForm.handleChange}
+						error={clientForm.touched.fullName && clientForm.errors.fullName ? true : false}
+						helperText={clientForm.touched.fullName ? clientForm.errors.fullName : ''}
+						size={'small'}
+						fullWidth
+						value={clientForm.values.fullName}
 					/>
 				</Grid>
 				<Grid item xs={12} sm={6} md={6}>
-					<CPSingleSelectAutoCompleteDropDown size="small" options={[{ key: '1', value: 'sss', id: 1 }]} label="All" />
-				</Grid>
-				<Grid item xs={12} sm={6} md={6}>
 					<CPTextField
-						label="Name"
-						name="name"
-						onBlur={clientForm.handleBlur}
-						handleChange={clientForm.handleChange}
-						error={clientForm.touched.name && clientForm.errors.name ? true : false}
-						helperText={clientForm.touched.name ? clientForm.errors.name : ''}
-						size={'small'}
-						fullWidth
-					/>
-				</Grid>
-				<Grid item xs={12} sm={6} md={6}>
-					<CPTextField
-						label="description"
-						name="description"
+						label={t('email')}
+						name="email"
 						handleChange={clientForm.handleChange}
 						onBlur={clientForm.handleBlur}
-						error={clientForm.touched.description && clientForm.errors.description ? true : false}
-						helperText={clientForm.touched.description ? clientForm.errors.description : ''}
+						error={clientForm.touched.email && clientForm.errors.email ? true : false}
+						helperText={clientForm.touched.email ? clientForm.errors.email : ''}
 						size={'small'}
 						fullWidth
+						value={clientForm.values.email}
 					/>
 				</Grid>
 			</Grid>
@@ -112,7 +245,14 @@ const Accounts: NextPage = () => {
 						handleClose={handleClose}
 						actions={
 							<>
-								<CPButton label={'Create user'} variant="contained" style={{ padding: '8px 32px' }} />
+								<CPLoadingButton
+									label={'Create user'}
+									variant="contained"
+									style={{ padding: '8px 32px' }}
+									onClick={clientForm.submitForm}
+									disabled={!(clientForm.isValid && clientForm.dirty)}
+									loading={isCreatingAccount}
+								/>
 							</>
 						}
 					/>

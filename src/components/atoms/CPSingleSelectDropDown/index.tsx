@@ -1,41 +1,47 @@
 import * as React from 'react';
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { FormControl, FormHelperText, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { ChangeEvent } from 'react';
+import { IOptionItem } from 'interfaces/optionItem.interface';
 
 interface ICPSingleSelectDropDown {
-	options: OptionItem[];
+	options: IOptionItem[];
 	label?: string;
-	handleChange: (text: string) => void;
 	fullWidth?: boolean;
 	size?: 'small' | 'medium';
+	error?: boolean | undefined;
+	helperText?: string;
+	setFieldValue?: (field: string, value: any, shouldValidate?: boolean | undefined) => void;
+	onChange?: (event: SelectChangeEvent<string>) => void;
+	onBlur?: (e: ChangeEvent) => void;
+	name: string;
+	id?: string | undefined;
+	disabled?: boolean;
 }
-interface OptionItem {
-	key: string;
-	value: string;
-	id: number;
-}
+
 export default function CPSingleSelectDropDown(props: ICPSingleSelectDropDown) {
-	const [age, setAge] = React.useState('');
-	const { label, options, fullWidth, size } = props;
-	const handleChange = (event: SelectChangeEvent) => {
-		setAge(event.target.value as string);
-	};
+	const { label, options, fullWidth, size, name, helperText, error, setFieldValue, id, onBlur, onChange, disabled } =
+		props;
 
 	return (
-		<FormControl fullWidth={fullWidth} size={size}>
-			<InputLabel id="demo-simple-select-label">{label}</InputLabel>
+		<FormControl fullWidth={fullWidth} size={size} error={error} disabled={disabled}>
+			<InputLabel id={id}>{label}</InputLabel>
 			<Select
-				labelId="demo-simple-select-label"
-				id="demo-simple-select"
-				value={age}
 				label={label}
-				onChange={handleChange}
+				onChange={(e) => {
+					setFieldValue?.(name, e.target.value);
+					onChange?.(e);
+				}}
+				onBlur={onBlur}
+				name={name}
+				defaultValue=""
 			>
 				{Object.values(options).map((option) => (
-					<MenuItem key="option.key" value={option.value}>
-						{option.value}
+					<MenuItem key={option.value} value={option.value}>
+						{option.label}
 					</MenuItem>
 				))}
 			</Select>
+			<FormHelperText>{helperText}</FormHelperText>
 		</FormControl>
 	);
 }

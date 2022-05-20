@@ -10,15 +10,14 @@ interface ICPTextField {
 	onBlur?: (e: ChangeEvent) => void;
 	size?: 'small' | 'medium';
 	fullWidth?: boolean;
-	type?: string;
+	value?: unknown;
 }
 
 export default function CPTextField(props: ICPTextField) {
-	const { label, handleChange, error, name, helperText, onBlur, size, fullWidth, type } = props;
+	const { label, handleChange, error, name, helperText, onBlur, size, fullWidth, value } = props;
 
 	return (
 		<TextField
-			type={type}
 			id="outlined-basic"
 			label={label}
 			name={name}
@@ -29,6 +28,7 @@ export default function CPTextField(props: ICPTextField) {
 			helperText={helperText}
 			size={size}
 			fullWidth={fullWidth}
+			value={value}
 		/>
 	);
 }

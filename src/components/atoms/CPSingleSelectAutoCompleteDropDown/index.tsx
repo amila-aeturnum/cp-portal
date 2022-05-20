@@ -1,29 +1,56 @@
 import * as React from 'react';
-import { Autocomplete, Button, TextField } from '@mui/material';
-
+import { Autocomplete, CircularProgress, TextField } from '@mui/material';
+import { ChangeEvent } from 'react';
+import { IOptionItem } from 'interfaces/optionItem.interface';
 interface ICPSingleSelectAutoCompleteDropDown {
 	label: string;
-	options: OptionItem[];
+	options: IOptionItem[];
 	size?: 'small' | 'medium';
 	id?: string;
-}
-
-interface OptionItem {
-	key: string;
-	value: string;
-	id: number;
+	error?: boolean | undefined;
+	helperText?: string;
+	setFieldValue: (field: string, value: any, shouldValidate?: boolean | undefined) => void;
+	onBlur?: (e: ChangeEvent) => void;
+	name: string;
+	loading?: boolean;
+	disableClearable?: boolean;
 }
 
 export default function CPSingleSelectAutoCompleteDropDown(props: ICPSingleSelectAutoCompleteDropDown) {
-	const { label, size, options, id } = props;
+	const { label, setFieldValue, error, helperText, onBlur, size, options, id, name, loading, disableClearable } = props;
 	return (
 		<Autocomplete
 			size={size}
 			id={id}
 			fullWidth={true}
 			options={options}
-			getOptionLabel={(option) => option.value}
-			renderInput={(params) => <TextField {...params} label={label} />}
+			getOptionLabel={(option) => option.label}
+			onChange={(e: object, value: any | null) => {
+				setFieldValue(name, value.value);
+			}}
+			disableClearable={disableClearable}
+			loading={loading}
+			renderInput={(params) => (
+				<TextField
+					{...params}
+					InputProps={{
+						...params.InputProps,
+						endAdornment: (
+							<React.Fragment>
+								{loading ? (
+									<CircularProgress color="inherit" size={20} style={{ position: 'absolute', right: '32px' }} />
+								) : null}
+								{params.InputProps.endAdornment}
+							</React.Fragment>
+						)
+					}}
+					name={name}
+					label={label}
+					error={error}
+					onBlur={onBlur}
+					helperText={helperText}
+				/>
+			)}
 		/>
 	);
 }
