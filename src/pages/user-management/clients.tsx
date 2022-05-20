@@ -22,6 +22,7 @@ import CPMultiSelectDropDown from 'components/atoms/CPMultiSelectDropDown';
 interface IClientForm {
 	name?: string;
 	clientEmail: string;
+	analystIdList: string[];
 }
 
 const Clients: NextPage = () => {
@@ -50,13 +51,13 @@ const Clients: NextPage = () => {
 			axiosInstance
 				.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager//user/analyst`)
 				.then(function (response) {
-					const newArray = response.data.userList.map((item: any) => ({
-						id: item.id,
+					let newArray = [];
+					newArray = response.data.userList.map((item: any) => ({
 						value: item.userFullName,
-						key: item.email
+						key: item.id
 					}));
-
 					console.log(newArray);
+					//newArray = newArray.slice(0, newArray.length - 10);
 					setanalystList(newArray);
 				})
 				.catch((error) => {
@@ -104,7 +105,8 @@ const Clients: NextPage = () => {
 			.required('Client Name is required')
 			.max(255, 'Cannot exceed 255 characters')
 			.matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
-		clientEmail: yup.string().email('Invalid email format').required('Email is required')
+		clientEmail: yup.string().email('Invalid email format').required('Email is required'),
+		analystIdList: yup.array().required('Client Name is required')
 	});
 
 	const changeLanguage = (lng: string) => {
@@ -114,16 +116,30 @@ const Clients: NextPage = () => {
 	const clientForm = useFormik({
 		initialValues: {
 			name: '',
-			clientEmail: ''
+			clientEmail: '',
+			analystIdList: []
 		},
 		validationSchema: validationSchema,
 		onSubmit: (values: IClientForm) => {
+			debugger;
 			alert(JSON.stringify(values));
 			handleClose();
 		}
 	});
+	// const createClient = (client: IClientForm) => {
+	// 	axiosInstance
+	// 		.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/create`, client)
 
+	// 		.then(function (response) {
+	// 			handleClose();
+	// 		})
+
+	// 		.catch((error) => {
+	// 			console.log(error);
+	// 		});
+	// };
 	const handleSave = () => {
+		debugger;
 		clientForm.handleSubmit();
 	};
 
@@ -133,6 +149,10 @@ const Clients: NextPage = () => {
 
 	const handleAdd = () => {
 		setInputList([...inputList, 'element']);
+	};
+	const handleMultiselect = (event: any, newValue: any) => {
+		debugger;
+		console.log(event);
 	};
 
 	const dialogContent = (
@@ -163,7 +183,21 @@ const Clients: NextPage = () => {
 					/>
 				</Grid>
 				<Grid item xs={6}>
-					<CPMultiSelectDropDown options={analystList} label="Select analyst" handleChange={handleOnChange} />
+					<CPMultiSelectDropDown
+						id="analystIdList"
+						options={analystList}
+						label="Select analyst"
+						onBlur={clientForm.handleBlur}
+						handleChange={handleMultiselect}
+						//	handleChange={clientForm.handleChange}
+						name="analystIdList"
+						error={true} //{clientForm.touched.analystIdList && clientForm.errors.analystIdList ? true : false}
+						helperText={
+							clientForm.touched.analystIdList && clientForm.touched.analystIdList.length > 0
+								? clientForm.errors.analystIdList?.[0]
+								: 'error'
+						}
+					/>
 				</Grid>
 				<Grid item xs={12}>
 					<Grid container spacing={3} sx={{ marginTop: '20px' }}>
