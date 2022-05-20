@@ -11,7 +11,10 @@ const resources = {
 			email: 'Email',
 			value_required: 'Value Required',
 			name: 'Name',
-			invalid_email: 'Invalid email address'
+			invalid_email: 'Invalid email address',
+			error: 'Error',
+			successful: 'Successful',
+			new_user_account_created:'New user account has been created.'
 		}
 	},
 	fr: {

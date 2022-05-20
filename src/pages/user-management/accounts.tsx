@@ -3,7 +3,7 @@ import styles from '../../../styles/Home.module.css';
 import { useState, useEffect } from 'react';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import ResponsiveDialog from 'components/molecules/ResponsiveDialog';
-import { Grid, OutlinedInput, InputAdornment, SelectChangeEvent, CircularProgress } from '@mui/material';
+import { Grid, OutlinedInput, InputAdornment, SelectChangeEvent } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CPButton from 'components/atoms/CPButton';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
@@ -20,7 +20,8 @@ import { IOptionItem } from 'interfaces/optionItem.interface';
 import { toFirstLetterCapital } from 'utils/helpers';
 import { IUserAccountList } from 'types/userAccountList.type';
 import CPLoadingButton from 'components/atoms/CPLoadingButton';
-
+import { useSnackbar } from 'notistack';
+import CPAlert from 'components/atoms/CPAlert';
 interface IClientForm {
 	fullName: string;
 	email: string;
@@ -37,6 +38,7 @@ const Accounts: NextPage = () => {
 	const [isAnalyst, setIsAnalyst] = useState<Boolean | null>(null);
 	const [isCreatingAccount, setIsCreatingAccount] = useState<boolean>(false);
 	const { t } = useTranslation();
+	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 	// get user roles
 	useEffect(() => {
 		if (open) {
@@ -109,11 +111,15 @@ const Accounts: NextPage = () => {
 		axiosInstance
 			.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/create`, client)
 			.then(function (response) {
+				enqueueSnackbar(
+					<CPAlert title={t('successful')} message={t('new_user_account_created')} severity={'success'} />
+				);
 				handleClose();
 				setIsCreatingAccount(false);
 			})
 			.catch((error) => {
 				console.log(error);
+				enqueueSnackbar(<CPAlert title={t('error')} message={'Something whent wrong'} severity={'error'} />);
 				setIsCreatingAccount(false);
 			});
 	};
