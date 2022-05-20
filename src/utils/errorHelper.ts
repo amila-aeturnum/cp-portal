@@ -2,7 +2,6 @@ import { AxiosError } from 'axios';
 import { get } from 'lodash';
 import i18next from './i18n'
 import { createElement, ReactNode } from 'react';
-import { TFunctionResult } from 'i18next';
 
 export const getReadableError = (error: any) : string | ReactNode  => {
 
