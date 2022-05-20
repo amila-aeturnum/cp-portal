@@ -239,7 +239,7 @@ const Clients: NextPage = () => {
 						onBlur={clientForm.handleBlur}
 						handleChange={handleMultiselect}
 						//	handleChange={clientForm.handleChange}
-
+						size={'small'}
 						name="analystIdList"
 						error={clientForm.touched.analystIdList && clientForm.errors.analystIdList ? true : false}
 						helperText={clientForm.touched.analystIdList ? clientForm.errors.analystIdList : ''}
@@ -251,34 +251,35 @@ const Clients: NextPage = () => {
 							<span>Report recipient email</span>
 						</Grid>
 						<Grid item xs={12}>
-							<Stack spacing={3} direction="column">
-								{/* <Grid item xs={12}> */}
-								{inputList.map((input) => (
-									<CPTextField label="Email" fullWidth size="small" name={'ss'} />
-								))}
-
-								{/* </Grid> */}
-								<Grid item xs={6}>
-									<CPTextField
-										label="Email"
-										name="recipientEmail"
-										fullWidth
-										size="small"
-										onBlur={clientForm.handleBlur}
-										handleChange={clientForm.handleChange}
-										error={clientForm.touched.recipientEmail && clientForm.errors.recipientEmail ? true : false}
-										helperText={clientForm.touched.recipientEmail ? clientForm.errors.recipientEmail : ''}
-									/>
-									<CPButton
-										label={<AddIcon />}
-										onClick={handleAdd}
-										variant="contained"
-										style={{ width: '48px', height: '48px', marginLeft: 10 }}
-										
-									/>
-									<span style={{ marginLeft: 10 }}>add more</span>
-								</Grid>
-							</Stack>
+							<Grid item xs={6}>
+								<Stack spacing={3} direction="column">
+									{/* <Grid item xs={12}> */}
+									{inputList.map((input) => (
+										<CPTextField label="Email" fullWidth size="small" name={'ss'} />
+									))}
+								</Stack>
+							</Grid>
+							{/* </Grid> */}
+							<Grid item xs={6} sx={{ display: 'flex' }}>
+								<CPTextField
+									label="Email"
+									name="recipientEmail"
+									fullWidth
+									size="small"
+									onBlur={clientForm.handleBlur}
+									handleChange={clientForm.handleChange}
+									error={clientForm.errors.recipientEmail ? true : false}
+									helperText={clientForm.errors.recipientEmail ? clientForm.errors.recipientEmail : ''}
+								/>
+								<CPButton
+									label={<AddIcon />}
+									onClick={handleAdd}
+									variant="contained"
+									style={{ width: '48px', height: '48px', marginLeft: 10 }}
+									disabled={clientForm.errors.recipientEmail ? true : false}
+								/>
+								<span style={{ marginLeft: 10 }}>add more</span>
+							</Grid>
 						</Grid>
 						<Grid item xs={12}>
 							<Grid container sx={{ marginTop: '20px', marginBottom: '20px' }}>

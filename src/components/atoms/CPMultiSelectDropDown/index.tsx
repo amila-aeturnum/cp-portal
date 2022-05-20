@@ -16,6 +16,7 @@ interface CPMultiSelectDropDown {
 	name: string;
 	error?: boolean | undefined;
 	helperText?: string | any;
+	size?: 'small' | 'medium';
 }
 
 interface OptionItem {
@@ -27,14 +28,14 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 export default function CPMultiSelectDropDown(props: CPMultiSelectDropDown) {
-	const { label, options, placeHolder, id, handleChange, name, error, onBlur, helperText } = props;
+	const { label, options, placeHolder, id, handleChange, name, error, onBlur, helperText, size } = props;
 	return (
 		<Autocomplete
 			multiple
 			onChange={handleChange}
 			id={id}
 			onBlur={onBlur}
-			// name={name}
+			size={size}
 			options={options}
 			disableCloseOnSelect
 			isOptionEqualToValue={(option, value) => option.key === value.key}
@@ -52,10 +53,10 @@ export default function CPMultiSelectDropDown(props: CPMultiSelectDropDown) {
 					{option.value}
 				</li>
 			)}
-			style={{ width: 318, height: 42 }}
 			renderInput={(params) => (
 				<TextField
 					{...params}
+					size={size}
 					name={name}
 					label={label}
 					error={error}
