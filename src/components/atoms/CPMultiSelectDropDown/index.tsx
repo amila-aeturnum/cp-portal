@@ -15,7 +15,7 @@ interface CPMultiSelectDropDown {
 	placeHolder?: string;
 	name: string;
 	error?: boolean | undefined;
-	helperText?: string;
+	helperText?: string | any;
 }
 
 interface OptionItem {
@@ -33,6 +33,8 @@ export default function CPMultiSelectDropDown(props: CPMultiSelectDropDown) {
 			multiple
 			onChange={handleChange}
 			id={id}
+			onBlur={onBlur}
+			// name={name}
 			options={options}
 			disableCloseOnSelect
 			isOptionEqualToValue={(option, value) => option.key === value.key}
@@ -57,7 +59,6 @@ export default function CPMultiSelectDropDown(props: CPMultiSelectDropDown) {
 					name={name}
 					label={label}
 					error={error}
-					onBlur={onBlur}
 					helperText={helperText}
 					placeholder={placeHolder}
 				/>

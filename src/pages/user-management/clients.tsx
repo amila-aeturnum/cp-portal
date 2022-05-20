@@ -23,6 +23,7 @@ interface IClientForm {
 	name?: string;
 	clientEmail: string;
 	analystIdList: string[];
+	recipientEmail?: string;
 }
 
 const Clients: NextPage = () => {
@@ -106,7 +107,8 @@ const Clients: NextPage = () => {
 			.max(255, 'Cannot exceed 255 characters')
 			.matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
 		clientEmail: yup.string().email('Invalid email format').required('Email is required'),
-		analystIdList: yup.array().required('Client Name is required')
+		analystIdList: yup.array().min(1, 'Client Name is required'),
+		recipientEmail: yup.string().email('Email is required')
 	});
 
 	const changeLanguage = (lng: string) => {
@@ -151,9 +153,11 @@ const Clients: NextPage = () => {
 		setInputList([...inputList, 'element']);
 	};
 	const handleMultiselect = (event: any, newValue: any) => {
-		debugger;
-		console.log(event);
+		console.log(newValue);
+		clientForm.setFieldValue('analystIdList', newValue);
 	};
+
+	console.log('value:', clientForm.touched.analystIdList);
 
 	const dialogContent = (
 		<form onSubmit={clientForm.handleSubmit} onReset={clientForm.handleReset}>
@@ -190,13 +194,10 @@ const Clients: NextPage = () => {
 						onBlur={clientForm.handleBlur}
 						handleChange={handleMultiselect}
 						//	handleChange={clientForm.handleChange}
+
 						name="analystIdList"
-						error={true} //{clientForm.touched.analystIdList && clientForm.errors.analystIdList ? true : false}
-						helperText={
-							clientForm.touched.analystIdList && clientForm.touched.analystIdList.length > 0
-								? clientForm.errors.analystIdList?.[0]
-								: 'error'
-						}
+						error={clientForm.touched.analystIdList && clientForm.errors.analystIdList ? true : false}
+						helperText={clientForm.touched.analystIdList ? clientForm.errors.analystIdList : ''}
 					/>
 				</Grid>
 				<Grid item xs={12}>
@@ -208,12 +209,22 @@ const Clients: NextPage = () => {
 							<Stack spacing={3} direction="column">
 								{/* <Grid item xs={12}> */}
 								{inputList.map((input) => (
-									<CPTextField label="Email" name="recipientEmail" fullWidth size="small" />
+									<CPTextField label="Email" fullWidth size="small" name={'ss'} />
 								))}
 
 								{/* </Grid> */}
 								<Grid item xs={6}>
-									<CPTextField label="Email" name="recipientEmail" fullWidth size="small" />
+									<CPTextField
+										label="Email"
+										name="recipientEmail"
+										fullWidth
+										size="small"
+										type="email"
+										onBlur={clientForm.handleBlur}
+										handleChange={clientForm.handleChange}
+										error={clientForm.touched.recipientEmail && clientForm.errors.recipientEmail ? true : false}
+										helperText={clientForm.touched.recipientEmail ? clientForm.errors.recipientEmail : ''}
+									/>
 									<CPButton
 										label={<AddIcon />}
 										onClick={handleAdd}

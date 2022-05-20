@@ -12,8 +12,10 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
 	(config) => {
 		const token = getAuthToken();
-		if (token) {
-			return { ...config, headers: { Authorization: `Bearer ${token}`, 'Access-Control-Allow-Origin': true } };
+		if (!token) {
+			return { ...config, 
+				 headers: { Authorization: `Bearer ${token}`,
+				 'Access-Control-Allow-Origin': true } };
 		}
 		return config;
 	},
