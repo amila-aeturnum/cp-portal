@@ -22,6 +22,7 @@ import { IUserAccountList } from 'types/userAccountList.type';
 import CPLoadingButton from 'components/atoms/CPLoadingButton';
 import { useSnackbar } from 'notistack';
 import CPAlert from 'components/atoms/CPAlert';
+import { getReadableError } from 'utils/errorHelper';
 interface IClientForm {
 	fullName: string;
 	email: string;
@@ -54,7 +55,8 @@ const Accounts: NextPage = () => {
 					setIsLoadingUserTypes(false);
 				})
 				.catch((error) => {
-					console.log(error);
+					let message = getReadableError(error);
+					enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 					setIsLoadingUserTypes(false);
 				});
 		}
@@ -74,7 +76,8 @@ const Accounts: NextPage = () => {
 					setIsLoadingClientList(false);
 				})
 				.catch((error) => {
-					console.log(error);
+					let message = getReadableError(error);
+					enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 					setIsLoadingClientList(false);
 				});
 		}
@@ -118,8 +121,8 @@ const Accounts: NextPage = () => {
 				setIsCreatingAccount(false);
 			})
 			.catch((error) => {
-				console.log(error);
-				enqueueSnackbar(<CPAlert title={t('error')} message={'Something whent wrong'} severity={'error'} />);
+				let message = getReadableError(error);
+				enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 				setIsCreatingAccount(false);
 			});
 	};

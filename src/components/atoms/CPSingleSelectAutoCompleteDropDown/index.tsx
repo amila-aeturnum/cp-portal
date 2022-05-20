@@ -26,7 +26,6 @@ export default function CPSingleSelectAutoCompleteDropDown(props: ICPSingleSelec
 			options={options}
 			getOptionLabel={(option) => option.label}
 			onChange={(e: object, value: any | null) => {
-				console.log(value);
 				setFieldValue(name, value.value);
 			}}
 			disableClearable={disableClearable}
