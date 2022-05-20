@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { Alert, AlertColor, AlertTitle } from '@mui/material';
 import { useTheme } from '@mui/material';
-import { TFunctionResult } from 'i18next';
 
 interface ICPAlert {
 	message: string | React.ReactNode;
