@@ -48,7 +48,7 @@ export default function Layout(props: ILayout) {
 		if (authenticated) {
 			instance.acquireTokenSilent(request).then((response) => {
 				const accessToken = response.accessToken;
-				setAuthToken(accessToken);
+				// setAuthToken(accessToken);
 				axiosInstance
 					.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/profile`)
 					.then(function (response) {
