@@ -11,10 +11,11 @@ interface ICPTextField {
 	onBlur?: (e: ChangeEvent) => void;
 	size?: 'small' | 'medium';
 	fullWidth?: boolean;
+	value?: unknown;
 }
 
 export default function CPTextField(props: ICPTextField) {
-	const { label, handleChange, error, name, helperText, onBlur, size, fullWidth } = props;
+	const { label, handleChange, error, name, helperText, onBlur, size, fullWidth, value } = props;
 
 	return (
 		<TextField
@@ -28,6 +29,7 @@ export default function CPTextField(props: ICPTextField) {
 			helperText={helperText}
 			size={size}
 			fullWidth={fullWidth}
+			value={value}
 		/>
 	);
 }

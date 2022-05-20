@@ -8,12 +8,14 @@ const resources = {
 			userType: 'User type',
 			client: 'Client',
 			email: 'Email',
-			value_required: 'Value Required',
+			value_required: 'This field cannot be empty',
 			name: 'Name',
 			invalid_email: 'Invalid email address',
+			invalid_name: 'Invalid email name',
 			error: 'Error',
 			successful: 'Successful',
-			new_user_account_created: 'New user account has been created.'
+			new_user_account_created:'New user account has been created.',
+			went_wrong: 'Something went wrong. Please try again later'
 		}
 	},
 	fr: {

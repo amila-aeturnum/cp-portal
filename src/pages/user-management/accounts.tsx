@@ -22,6 +22,7 @@ import { IUserAccountList } from 'types/userAccountList.type';
 import CPLoadingButton from 'components/atoms/CPLoadingButton';
 import { useSnackbar } from 'notistack';
 import CPAlert from 'components/atoms/CPAlert';
+import { getReadableError } from 'utils/errorHelper';
 interface IClientForm {
 	fullName: string;
 	email: string;
@@ -54,7 +55,8 @@ const Accounts: NextPage = () => {
 					setIsLoadingUserTypes(false);
 				})
 				.catch((error) => {
-					console.log(error);
+					let message = getReadableError(error);
+					enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 					setIsLoadingUserTypes(false);
 				});
 		}
@@ -74,7 +76,8 @@ const Accounts: NextPage = () => {
 					setIsLoadingClientList(false);
 				})
 				.catch((error) => {
-					console.log(error);
+					let message = getReadableError(error);
+					enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 					setIsLoadingClientList(false);
 				});
 		}
@@ -118,8 +121,8 @@ const Accounts: NextPage = () => {
 				setIsCreatingAccount(false);
 			})
 			.catch((error) => {
-				console.log(error);
-				enqueueSnackbar(<CPAlert title={t('error')} message={'Something whent wrong'} severity={'error'} />);
+				let message = getReadableError(error);
+				enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 				setIsCreatingAccount(false);
 			});
 	};
@@ -128,15 +131,15 @@ const Accounts: NextPage = () => {
 	if (isAnalyst) {
 		validationSchemaConditional = yup.object({
 			userRole: yup.string().required(t('value_required')),
-			fullName: yup.string().required(t('value_required')),
-			email: yup.string().required(t('value_required')).email()
+			fullName: yup.string().max(255, t('invalid_name')).required(t('value_required')).trim(),
+			email: yup.string().required(t('value_required')).max(255, t('invalid_email')).email(t('invalid_email')).trim()
 		});
 	} else {
 		validationSchemaConditional = yup.object({
 			userRole: yup.string().required(t('value_required')),
 			clientAccountId: yup.string().required(t('value_required')),
-			fullName: yup.string().required(t('value_required')),
-			email: yup.string().required(t('value_required')).max(255, t('invalid_email')).email(t('invalid_email'))
+			fullName: yup.string().max(255, t('invalid_name')).required(t('value_required')).trim(),
+			email: yup.string().required(t('value_required')).max(255, t('invalid_email')).email(t('invalid_email')).trim()
 		});
 	}
 
@@ -151,12 +154,21 @@ const Accounts: NextPage = () => {
 		},
 		validationSchema: validationSchema,
 		onSubmit: (values: IClientForm) => {
-			createAccount(values);
+			const castValues = validationSchema.cast(values);
+			createAccount(castValues);
 		}
 	});
 
 	const dialogContent = (
-		<form onSubmit={clientForm.handleSubmit} onReset={clientForm.handleReset}>
+		<form
+			onSubmit={clientForm.handleSubmit}
+			onReset={clientForm.handleReset}
+			onBlur={() => {
+				// format inputs
+				clientForm.values.fullName = clientForm.values.fullName.trim();
+				clientForm.values.email = clientForm.values.email.trim();
+			}}
+		>
 			<Grid container sx={{ marginTop: '10px' }} spacing={3}>
 				<Grid item xs={12} sm={6} md={6}>
 					<CPSingleSelectDropDown
@@ -198,6 +210,7 @@ const Accounts: NextPage = () => {
 						helperText={clientForm.touched.fullName ? clientForm.errors.fullName : ''}
 						size={'small'}
 						fullWidth
+						value={clientForm.values.fullName}
 					/>
 				</Grid>
 				<Grid item xs={12} sm={6} md={6}>
@@ -210,6 +223,7 @@ const Accounts: NextPage = () => {
 						helperText={clientForm.touched.email ? clientForm.errors.email : ''}
 						size={'small'}
 						fullWidth
+						value={clientForm.values.email}
 					/>
 				</Grid>
 			</Grid>
