@@ -5,8 +5,7 @@ import { initReactI18next } from 'react-i18next';
 const resources = {
 	en: {
 		translation: {
-			'Welcome to React': 'Welcome to React and react-i18next',
-			userType: "User type",
+			userType: 'User type',
 			client: 'Client',
 			email: 'Email',
 			value_required: 'This field cannot be empty',

@@ -1,12 +1,5 @@
 import { TableCell, TableHead, TableRow } from '@mui/material';
-
-export interface IColumn {
-	id: string;
-	label: string;
-	minWidth?: number;
-	align?: 'right' | 'left';
-	format?: (value: number) => string;
-}
+import { IColumn } from './DataTable.type';
 
 interface ITableHeader {
 	columns: IColumn[];
@@ -23,7 +16,7 @@ export default function DataTableHeader(props: ITableHeader) {
 					</TableCell>
 				))}
 				<TableCell align="right" style={{ minWidth: 170 }}>
-					Action
+					Actions
 				</TableCell>
 			</TableRow>
 		</TableHead>
