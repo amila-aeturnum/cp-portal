@@ -5,10 +5,12 @@ import { ButtonBaseActions } from '@mui/material';
 interface ICPSwitch {
 	disabled?: boolean;
 	action?: React.Ref<ButtonBaseActions>;
+	handleChange?: (event: any, checked: any) => void;
+	checked?: boolean;
 }
 export default function CPSwitch(props: ICPSwitch) {
-	const { disabled, action } = props;
-	return <IOSSwitch disabled={disabled} action={action} />;
+	const { disabled, action, handleChange, checked } = props;
+	return <IOSSwitch disabled={disabled} action={action} onChange={handleChange} checked={checked} />;
 }
 
 const IOSSwitch = styled((props: SwitchProps) => (

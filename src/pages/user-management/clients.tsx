@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import styles from '../../../styles/Home.module.css';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import ResponsiveDialog from 'components/molecules/ResponsiveDialog';
-import { Button, Grid, OutlinedInput, InputAdornment, Stack } from '@mui/material';
+import { Button, Grid, OutlinedInput, InputAdornment, Stack, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DataTable from 'components/molecules/DataTable';
 import CPButton from 'components/atoms/CPButton';
@@ -23,11 +23,16 @@ import { deleteEndpointPromise, getEndpointPromise } from 'services/apiServices'
 import fileDownload from 'js-file-download';
 import { IClient, IUserAccount } from 'types/client.type';
 import { useSnackbar } from 'notistack';
+import CPAlert from 'components/atoms/CPAlert';
+import { getReadableError } from 'utils/errorHelper';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 interface IClientForm {
 	name?: string;
-	clientEmail: string;
-	analystIdList: string[];
-	recipientEmail?: string;
+	email: string;
+	analystIdList: any[];
+	recipientEmailList: string[];
+	isConversionRate: boolean;
+	isCostPerAcquisition: boolean;
 }
 
 const Clients: NextPage = () => {
@@ -43,6 +48,9 @@ const Clients: NextPage = () => {
 	const [tableLoading, setTableLoading] = useState<boolean>(false);
 	const debouncedKeyword = useDebounce<string>(keyword, 1000);
 	const { enqueueSnackbar } = useSnackbar();
+	const [isConversionRate, setisConversionRate] = useState<boolean>(false);
+	const [isCostPerAcquisition, setisCostPerAcquisition] = useState<boolean>(false);
+	const [recipientEmailList, setRecipientEmailList] = useState<string[]>([]);
 
 	useEffect(() => {
 		getAllClients();
@@ -155,36 +163,48 @@ const Clients: NextPage = () => {
 			.required('Client Name is required')
 			.max(255, 'Cannot exceed 255 characters')
 			.matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
-		clientEmail: yup.string().email('Invalid email format').required('Email is required'),
-		analystIdList: yup.array().min(1, 'Client Name is required'),
-		recipientEmail: yup.string().email('Email is required')
+		email: yup.string().email('Invalid email format').required('Email is required'),
+		analystIdList: yup.array().min(1, 'Client Name is required')
+		//recipientEmail: yup.array().min(1, 'Recipient Email is required')
 	});
 
 	const clientForm = useFormik({
 		initialValues: {
 			name: '',
-			clientEmail: '',
-			analystIdList: []
+			email: '',
+			analystIdList: [],
+			recipientEmailList: [],
+			isConversionRate: false,
+			isCostPerAcquisition: false
 		},
 		validationSchema: validationSchema,
 		onSubmit: (values: IClientForm) => {
 			debugger;
+			const castValues = validationSchema.cast(values);
+			createClient(values);
 			alert(JSON.stringify(values));
 			handleClose();
 		}
 	});
-	// const createClient = (client: IClientForm) => {
-	// 	axiosInstance
-	// 		.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/create`, client)
 
-	// 		.then(function (response) {
-	// 			handleClose();
-	// 		})
-
-	// 		.catch((error) => {
-	// 			console.log(error);
-	// 		});
-	// };
+	const createClient = (client: IClientForm) => {
+		debugger;
+		client.isConversionRate = isConversionRate;
+		client.isCostPerAcquisition = isCostPerAcquisition;
+		client.recipientEmailList = recipientEmailList;
+		axiosInstance
+			.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/client-account/create`, client)
+			.then(function (response) {
+				enqueueSnackbar(
+					<CPAlert title={t('successful')} message={t('New client has been created')} severity={'success'} />
+				);
+				handleClose();
+			})
+			.catch((error) => {
+				let message = getReadableError(error);
+				enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
+			});
+	};
 	const handleSave = () => {
 		debugger;
 		clientForm.handleSubmit();
@@ -198,11 +218,30 @@ const Clients: NextPage = () => {
 		setInputList([...inputList, 'element']);
 	};
 	const handleMultiselect = (event: any, newValue: any) => {
-		console.log(newValue);
-		clientForm.setFieldValue('analystIdList', newValue);
+		debugger;
+		let newArray = [];
+		newArray = newValue.map((item: any) => item.key);
+		//console.log(newValue);
+		clientForm.setFieldValue('analystIdList', newArray);
+	};
+	const handleisConversionRate = (event: any, checked: any) => {
+		debugger;
+		setisConversionRate(checked);
+	};
+	const handleisCostPerAcquisition = (event: any, checked: any) => {
+		debugger;
+		setisCostPerAcquisition(checked);
 	};
 
-	console.log('value:', clientForm.touched.analystIdList);
+	const handleRecipientEmail = (event: any) => {
+		debugger;
+		const emailArray: string[] = [event.target.value];
+		setRecipientEmailList(emailArray);
+	};
+
+	const handleRecipientEmailRemoveClick = (event: any) => {
+		debugger;
+	};
 
 	const dialogContent = (
 		<form onSubmit={clientForm.handleSubmit} onReset={clientForm.handleReset}>
@@ -222,11 +261,11 @@ const Clients: NextPage = () => {
 				<Grid item xs={6}>
 					<CPTextField
 						label="Client email"
-						name="clientEmail"
+						name="email"
 						onBlur={clientForm.handleBlur}
 						handleChange={clientForm.handleChange}
-						error={clientForm.touched.clientEmail && clientForm.errors.clientEmail ? true : false}
-						helperText={clientForm.touched.clientEmail ? clientForm.errors.clientEmail : ''}
+						error={clientForm.touched.email && clientForm.errors.email ? true : false}
+						helperText={clientForm.touched.email ? clientForm.errors.email : ''}
 						fullWidth
 						size="small"
 					/>
@@ -255,7 +294,22 @@ const Clients: NextPage = () => {
 								<Stack spacing={3} direction="column">
 									{/* <Grid item xs={12}> */}
 									{inputList.map((input) => (
-										<CPTextField label="Email" fullWidth size="small" name={'ss'} />
+										<CPTextField
+											handleChange={handleRecipientEmail}
+											label="Email"
+											fullWidth
+											size="small"
+											name={'ss'}
+											inputProps={{
+												endAdornment: (
+													<InputAdornment position="end">
+														<IconButton edge="end" style={{ color: 'red' }} onClick={handleRecipientEmailRemoveClick}>
+															<RemoveCircleIcon />
+														</IconButton>
+													</InputAdornment>
+												)
+											}}
+										/>
 									))}
 								</Stack>
 							</Grid>
@@ -266,17 +320,26 @@ const Clients: NextPage = () => {
 									name="recipientEmail"
 									fullWidth
 									size="small"
-									onBlur={clientForm.handleBlur}
-									handleChange={clientForm.handleChange}
-									error={clientForm.errors.recipientEmail ? true : false}
-									helperText={clientForm.errors.recipientEmail ? clientForm.errors.recipientEmail : ''}
+									onBlur={handleRecipientEmail}
+									inputProps={{
+										endAdornment: (
+											<InputAdornment position="end">
+												<IconButton edge="end" style={{ color: 'red' }} onClick={handleRecipientEmailRemoveClick}>
+													<RemoveCircleIcon />
+												</IconButton>
+											</InputAdornment>
+										)
+									}}
+									//handleChange={handleRecipientEmail}
+									//	error={clientForm.errors.recipientEmail ? true : false}
+									//	helperText={clientForm.errors.recipientEmail ? clientForm.errors.recipientEmail : ''}
 								/>
 								<CPButton
 									label={<AddIcon />}
 									onClick={handleAdd}
 									variant="contained"
 									style={{ width: '48px', height: '48px', marginLeft: 10 }}
-									disabled={clientForm.errors.recipientEmail ? true : false}
+									//	disabled={clientForm.errors.recipientEmail ? true : false}
 								/>
 								<span style={{ marginLeft: 10 }}>add more</span>
 							</Grid>
@@ -284,11 +347,11 @@ const Clients: NextPage = () => {
 						<Grid item xs={12}>
 							<Grid container sx={{ marginTop: '20px', marginBottom: '20px' }}>
 								<Grid item xs={6}>
-									<CPSwitch></CPSwitch>
+									<CPSwitch handleChange={handleisConversionRate}></CPSwitch>
 									<span style={{ marginLeft: 10 }}>Conversion rate</span>
 								</Grid>
 								<Grid item xs={6}>
-									<CPSwitch></CPSwitch>
+									<CPSwitch handleChange={handleisCostPerAcquisition}></CPSwitch>
 									<span style={{ marginLeft: 10 }}>Cost per acquisition</span>
 								</Grid>
 							</Grid>
