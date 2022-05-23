@@ -170,9 +170,9 @@ const Clients: NextPage = () => {
 			.required('Client Name is required')
 			.max(255, 'Cannot exceed 255 characters')
 			.matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
-		email: yup.string().email('Invalid email format').required('Email is required'),
-		analystIdList: yup.array().min(1, 'Client Name is required'),
-		recipientEmail: yup.string().email('Invalid email format').min(1, 'Recipient Email is required').trim(),
+		email: yup.string().email(t('invalid_email')).required('Email is required'),
+		analystIdList: yup.array().min(1, 'Analyst is required'),
+		recipientEmail: yup.string().email(t('invalid_email')).min(1, 'Recipient Email is required').trim(),
 		recipientEmailList: yup.array().min(1, 'Recipient email is required')
 	});
 
@@ -214,7 +214,7 @@ const Clients: NextPage = () => {
 	};
 
 	const handleAdd = () => {
-		let newEmailList = clientForm.values.recipientEmailList;
+		let newEmailList: string[] = ([] = clientForm.values.recipientEmailList);
 		let newEmail = (clientForm.values.recipientEmail ?? '').trim();
 		if (!newEmailList.includes(newEmail)) {
 			newEmailList.push(newEmail);
@@ -235,7 +235,7 @@ const Clients: NextPage = () => {
 		setisCostPerAcquisition(checked);
 	};
 
-	const handleRecipientEmailRemoveClick = (email: string) => {
+	const handleRecipientEmailRemoveClick = (email: never) => {
 		let newEmailList = clientForm.values.recipientEmailList;
 		const index = newEmailList.indexOf(email);
 		if (index > -1) {

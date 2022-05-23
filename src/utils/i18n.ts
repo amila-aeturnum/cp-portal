@@ -14,8 +14,9 @@ const resources = {
 			invalid_name: 'Invalid email name',
 			error: 'Error',
 			successful: 'Successful',
-			new_user_account_created:'New user account has been created.',
-			went_wrong: 'Something went wrong. Please try again later'
+			new_user_account_created: 'New user account has been created.',
+			went_wrong: 'Something went wrong. Please try again later',
+			Client_name_required: 'Client Name is required'
 		}
 	},
 	fr: {
