@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import styles from '../../../styles/Home.module.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import ResponsiveDialog from 'components/molecules/ResponsiveDialog';
 import { Grid, OutlinedInput, InputAdornment, SelectChangeEvent } from '@mui/material';
@@ -23,7 +23,15 @@ import CPLoadingButton from 'components/atoms/CPLoadingButton';
 import { useSnackbar } from 'notistack';
 import CPAlert from 'components/atoms/CPAlert';
 import { getReadableError } from 'utils/errorHelper';
-interface IClientForm {
+import useDebounce from 'hooks/useDebounce';
+import { deleteEndpointPromise, getEndpointPromise } from 'services/apiServices';
+import { get } from 'lodash';
+import DataTable from 'components/molecules/DataTable';
+import { IColumn } from 'components/molecules/DataTable/DataTable.type';
+import { useMsal } from '@azure/msal-react';
+import fileDownload from 'js-file-download';
+
+interface IAccountForm {
 	fullName: string;
 	email: string;
 	userRole: string;
@@ -40,6 +48,37 @@ const Accounts: NextPage = () => {
 	const [isCreatingAccount, setIsCreatingAccount] = useState<boolean>(false);
 	const { t } = useTranslation();
 	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+	const [page, setPage] = useState<number>(0);
+	const [rowsPerPage, setRowsPerPage] = useState<number>(5);
+	const [keyword, setKeyword] = useState<string>('');
+	const [tableLoading, setTableLoading] = useState<boolean>(false);
+	const debouncedKeyword = useDebounce<string>(keyword, 1000);
+	const [accountList, setAccountsList] = useState([]);
+	const [rowCount, setRowCount] = useState<number>(0);
+	const { accounts } = useMsal();
+	const currentAccount = accounts[0];
+
+	const columns: IColumn[] = [
+		{ id: 'clientName', label: 'Client Name', minWidth: 170 },
+		{ id: 'email', label: 'Email', minWidth: 100 },
+		{
+			id: 'userFullName',
+			label: 'Full Name',
+			minWidth: 170,
+			align: 'right'
+		},
+		{
+			id: 'userRole',
+			label: 'Role',
+			minWidth: 170,
+			align: 'right'
+		}
+	];
+
+	useEffect(() => {
+		getAllAccounts();
+	}, [page, rowsPerPage, debouncedKeyword]);
+
 	// get user roles
 	useEffect(() => {
 		if (open) {
@@ -82,6 +121,25 @@ const Accounts: NextPage = () => {
 				});
 		}
 	}, [open]);
+
+	const getAllAccounts = async () => {
+		try {
+			setTableLoading(true);
+			const response = await getEndpointPromise(
+				`/entitymanager/user/all?count=${rowsPerPage}&page=${page}&keyword=${keyword}&userObjectId=${get(
+					currentAccount,
+					'localAccountId'
+				)}`
+			);
+			setRowCount(get(response, 'data.pagination.total'));
+			setAccountsList(get(response, 'data.userList'));
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setTableLoading(false);
+		}
+	};
+
 	const onUserTypeChange = (e: SelectChangeEvent<string>) => {
 		if (userTypes.length == 0) {
 			return;
@@ -105,15 +163,24 @@ const Accounts: NextPage = () => {
 		setIsAnalyst(null);
 		setOpen(false);
 	};
-	const handleDataExport = () => {
-		alert('not implemented');
+	const handleDataExport = async () => {
+		try {
+			const response = await getEndpointPromise(`/entitymanager/user/download`);
+			fileDownload(response.data, 'clients.csv');
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
-	const createAccount = (client: IClientForm) => {
+	const createAccount = (client: IAccountForm) => {
 		setIsCreatingAccount(true);
 		axiosInstance
 			.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/create`, client)
 			.then(function (response) {
+				getAllAccounts();
+				enqueueSnackbar(
+					<CPAlert title={t('successful')} message={t('new_user_account_created')} severity={'success'} />
+				);
 				enqueueSnackbar(
 					<CPAlert title={t('successful')} message={t('new_user_account_created')} severity={'success'} />
 				);
@@ -153,11 +220,26 @@ const Accounts: NextPage = () => {
 			clientAccountId: ''
 		},
 		validationSchema: validationSchema,
-		onSubmit: (values: IClientForm) => {
+		onSubmit: (values: IAccountForm) => {
 			const castValues = validationSchema.cast(values);
 			createAccount(castValues);
 		}
 	});
+
+	const handleDelete = async (data: any) => {
+		try {
+			const response = await deleteEndpointPromise(`/entitymanager/user/delete?id=${data.id}`);
+			getAllAccounts();
+			enqueueSnackbar('Successfully Deleted', { variant: 'success' });
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setTableLoading(false);
+		}
+	};
+	const handleEdit = (data: any) => {
+		handleOpen();
+	};
 
 	const dialogContent = (
 		<form
@@ -280,9 +362,22 @@ const Accounts: NextPage = () => {
 										<CPButton label={'Search'} onClick={handleDataExport} variant="contained" />
 									</InputAdornment>
 								}
+								onChange={(e: ChangeEvent<HTMLInputElement>) => setKeyword(e.target.value)}
 							/>
 						</Grid>
 					</Grid>
+					<DataTable
+						onEditAction={handleEdit}
+						onDeleteAction={handleDelete}
+						rows={accountList}
+						rowCount={rowCount}
+						rowsPerPage={rowsPerPage}
+						page={page}
+						columns={columns}
+						setRowsPerPage={setRowsPerPage}
+						setPage={setPage}
+						loading={tableLoading}
+					/>
 				</div>
 			</main>
 		</div>
