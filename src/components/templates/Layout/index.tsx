@@ -48,7 +48,7 @@ export default function Layout(props: ILayout) {
 		if (authenticated) {
 			instance.acquireTokenSilent(request).then((response) => {
 				const accessToken = response.accessToken;
-				// setAuthToken(accessToken);
+				setAuthToken(accessToken);
 				axiosInstance
 					.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/profile`)
 					.then(function (response) {
@@ -92,7 +92,26 @@ export default function Layout(props: ILayout) {
 					</DrawerHeader>
 					<Divider />
 					<List sx={{ overflowY: 'auto', overflowX: 'hidden', height: '40%' }}>
-						{['User Management', 'Global Query List', 'Customized Queries', 'Statistics'].map((text, index) => (
+						<ListItemButton
+							sx={{
+								minHeight: 48,
+								justifyContent: open ? 'initial' : 'center',
+								px: 2.5
+							}}
+							onClick={() => router.push('/user-management/accounts')}
+						>
+							<ListItemIcon
+								sx={{
+									minWidth: 0,
+									mr: open ? 3 : 'auto',
+									justifyContent: 'center'
+								}}
+							>
+								<MailIcon />
+							</ListItemIcon>
+							<ListItemText primary={'User Management-Account'} sx={{ opacity: open ? 1 : 0 }} />
+						</ListItemButton>
+						{['User Management-Client', 'Global Query List', 'Customized Queries', 'Statistics'].map((text, index) => (
 							<ListItemButton
 								key={text}
 								sx={{
