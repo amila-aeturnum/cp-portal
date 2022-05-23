@@ -16,6 +16,7 @@ const resources = {
 			successful: 'Successful',
 			new_user_account_created: 'New user account has been created.',
 			went_wrong: 'Something went wrong. Please try again later',
+			client_name_required: 'Client Name is required',
 			no_records_found: 'No Records Found'
 		}
 	},
