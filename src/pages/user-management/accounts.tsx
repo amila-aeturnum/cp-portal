@@ -56,7 +56,7 @@ const Accounts: NextPage = () => {
 	const [rowCount, setRowCount] = useState<number>(0);
 	const { accounts } = useMsal();
 	const currentAccount = accounts[0];
-	console.log(currentAccount);
+
 	const columns: IColumn[] = [
 		{ id: 'clientName', label: 'Client Name', minWidth: 170 },
 		{ id: 'email', label: 'Email', minWidth: 100 },
