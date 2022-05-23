@@ -2,7 +2,7 @@ import type { NextPage } from 'next';
 import styles from '../../../styles/Home.module.css';
 import Breadcrumb from 'components/molecules/Breadcrumb';
 import ResponsiveDialog from 'components/molecules/ResponsiveDialog';
-import { Button, Grid, OutlinedInput, InputAdornment, Stack, IconButton } from '@mui/material';
+import { Grid, OutlinedInput, InputAdornment, Stack, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import DataTable from 'components/molecules/DataTable';
 import CPButton from 'components/atoms/CPButton';
@@ -26,6 +26,8 @@ import { useSnackbar } from 'notistack';
 import CPAlert from 'components/atoms/CPAlert';
 import { getReadableError } from 'utils/errorHelper';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import CPLoadingButton from 'components/atoms/CPLoadingButton';
+
 interface IClientForm {
 	name?: string;
 	email: string;
@@ -33,6 +35,7 @@ interface IClientForm {
 	recipientEmailList: string[];
 	isConversionRate: boolean;
 	isCostPerAcquisition: boolean;
+	recipientEmail?: string;
 }
 
 const Clients: NextPage = () => {
@@ -50,7 +53,7 @@ const Clients: NextPage = () => {
 	const { enqueueSnackbar } = useSnackbar();
 	const [isConversionRate, setisConversionRate] = useState<boolean>(false);
 	const [isCostPerAcquisition, setisCostPerAcquisition] = useState<boolean>(false);
-	const [recipientEmailList, setRecipientEmailList] = useState<string[]>([]);
+	const [isCreatingClient, setIsCreatingClient] = useState<boolean>(false);
 
 	useEffect(() => {
 		getAllClients();
@@ -65,7 +68,8 @@ const Clients: NextPage = () => {
 			setRowCount(get(response, 'data.pagination.total'));
 			setClientsList(get(response, 'data.userAccountList'));
 		} catch (error) {
-			console.log(error);
+			let message = getReadableError(error);
+			enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 		} finally {
 			setTableLoading(false);
 		}
@@ -80,26 +84,26 @@ const Clients: NextPage = () => {
 				setClientsList(response.data.userAccountList);
 			})
 			.catch((error) => {
-				console.log(error);
+				let message = getReadableError(error);
+				enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 			});
 	}, [page, rowsPerPage]);
 
 	useEffect(() => {
 		if (open === true) {
 			axiosInstance
-				.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager//user/analyst`)
+				.get(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/analyst`)
 				.then(function (response) {
 					let newArray = [];
 					newArray = response.data.userList.map((item: any) => ({
 						value: item.userFullName,
 						key: item.id
 					}));
-					console.log(newArray);
-					//newArray = newArray.slice(0, newArray.length - 10);
 					setanalystList(newArray);
 				})
 				.catch((error) => {
-					console.log(error);
+					let message = getReadableError(error);
+					enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 				});
 		}
 	}, [open]);
@@ -128,7 +132,6 @@ const Clients: NextPage = () => {
 	const handleEdit = (data: IUserAccount) => {
 		handleOpen();
 		setSelectedClient(data);
-		//alert(JSON.stringify(data));
 	};
 
 	const handleDelete = async (data: IUserAccount) => {
@@ -137,13 +140,16 @@ const Clients: NextPage = () => {
 			getAllClients();
 			enqueueSnackbar('Successfully Deleted', { variant: 'success' });
 		} catch (error) {
-			console.log(error);
+			let message = getReadableError(error);
+			enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 		} finally {
 			setTableLoading(false);
 		}
 	};
 
 	const handleClose = () => {
+		clientForm.setFieldValue('recipientEmailList', []);
+		clientForm.values.recipientEmailList = [];
 		clientForm.handleReset(clientForm);
 		setOpen(false);
 	};
@@ -152,7 +158,8 @@ const Clients: NextPage = () => {
 			const response = await getEndpointPromise(`/entitymanager/client-account/download`);
 			fileDownload(response.data, 'clients.csv');
 		} catch (error) {
-			console.log(error);
+			let message = getReadableError(error);
+			enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 		} finally {
 		}
 	};
@@ -164,14 +171,16 @@ const Clients: NextPage = () => {
 			.max(255, 'Cannot exceed 255 characters')
 			.matches(/^[aA-zZ\s]+$/, 'Only alphabets are allowed for this field '),
 		email: yup.string().email('Invalid email format').required('Email is required'),
-		analystIdList: yup.array().min(1, 'Client Name is required')
-		//recipientEmail: yup.array().min(1, 'Recipient Email is required')
+		analystIdList: yup.array().min(1, 'Client Name is required'),
+		recipientEmail: yup.string().email('Invalid email format').min(1, 'Recipient Email is required').trim(),
+		recipientEmailList: yup.array().min(1, 'Recipient email is required')
 	});
 
 	const clientForm = useFormik({
 		initialValues: {
 			name: '',
 			email: '',
+			recipientEmail: '',
 			analystIdList: [],
 			recipientEmailList: [],
 			isConversionRate: false,
@@ -179,70 +188,61 @@ const Clients: NextPage = () => {
 		},
 		validationSchema: validationSchema,
 		onSubmit: (values: IClientForm) => {
-			debugger;
 			const castValues = validationSchema.cast(values);
 			createClient(values);
-			alert(JSON.stringify(values));
-			handleClose();
 		}
 	});
 
 	const createClient = (client: IClientForm) => {
-		debugger;
 		client.isConversionRate = isConversionRate;
 		client.isCostPerAcquisition = isCostPerAcquisition;
-		client.recipientEmailList = recipientEmailList;
+		setIsCreatingClient(true);
 		axiosInstance
 			.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/client-account/create`, client)
 			.then(function (response) {
+				setIsCreatingClient(false);
 				enqueueSnackbar(
 					<CPAlert title={t('successful')} message={t('New client has been created')} severity={'success'} />
 				);
 				handleClose();
 			})
 			.catch((error) => {
+				setIsCreatingClient(false);
 				let message = getReadableError(error);
 				enqueueSnackbar(<CPAlert title={t('error')} message={message} severity={'error'} />);
 			});
 	};
-	const handleSave = () => {
-		debugger;
-		clientForm.handleSubmit();
-	};
-
-	const handleOnChange = () => {};
-
-	const [inputList, setInputList] = useState<string[]>([]);
 
 	const handleAdd = () => {
-		setInputList([...inputList, 'element']);
+		let newEmailList = clientForm.values.recipientEmailList;
+		let newEmail = (clientForm.values.recipientEmail ?? '').trim();
+		if (!newEmailList.includes(newEmail)) {
+			newEmailList.push(newEmail);
+			clientForm.setFieldValue('recipientEmailList', newEmailList);
+		}
+
+		clientForm.setFieldValue('recipientEmail', '');
 	};
 	const handleMultiselect = (event: any, newValue: any) => {
-		debugger;
 		let newArray = [];
 		newArray = newValue.map((item: any) => item.key);
-		//console.log(newValue);
 		clientForm.setFieldValue('analystIdList', newArray);
 	};
 	const handleisConversionRate = (event: any, checked: any) => {
-		debugger;
 		setisConversionRate(checked);
 	};
 	const handleisCostPerAcquisition = (event: any, checked: any) => {
-		debugger;
 		setisCostPerAcquisition(checked);
 	};
 
-	const handleRecipientEmail = (event: any) => {
-		debugger;
-		const emailArray: string[] = [event.target.value];
-		setRecipientEmailList(emailArray);
+	const handleRecipientEmailRemoveClick = (email: string) => {
+		let newEmailList = clientForm.values.recipientEmailList;
+		const index = newEmailList.indexOf(email);
+		if (index > -1) {
+			newEmailList.splice(index, 1);
+			clientForm.setFieldValue('recipientEmailList', newEmailList);
+		}
 	};
-
-	const handleRecipientEmailRemoveClick = (event: any) => {
-		debugger;
-	};
-
 	const dialogContent = (
 		<form onSubmit={clientForm.handleSubmit} onReset={clientForm.handleReset}>
 			<Grid container spacing={3} sx={{ marginTop: '10px' }}>
@@ -293,17 +293,22 @@ const Clients: NextPage = () => {
 							<Grid item xs={6}>
 								<Stack spacing={3} direction="column">
 									{/* <Grid item xs={12}> */}
-									{inputList.map((input) => (
+									{clientForm.values.recipientEmailList.map((email) => (
 										<CPTextField
-											handleChange={handleRecipientEmail}
 											label="Email"
 											fullWidth
 											size="small"
-											name={'ss'}
+											name={email}
+											value={email}
+											key={email}
 											inputProps={{
 												endAdornment: (
 													<InputAdornment position="end">
-														<IconButton edge="end" style={{ color: 'red' }} onClick={handleRecipientEmailRemoveClick}>
+														<IconButton
+															edge="end"
+															style={{ color: 'red' }}
+															onClick={() => handleRecipientEmailRemoveClick(email)}
+														>
 															<RemoveCircleIcon />
 														</IconButton>
 													</InputAdornment>
@@ -314,34 +319,32 @@ const Clients: NextPage = () => {
 								</Stack>
 							</Grid>
 							{/* </Grid> */}
-							<Grid item xs={6} sx={{ display: 'flex' }}>
+							<Grid item xs={6} sx={{ display: 'flex', paddingTop: '20px' }}>
 								<CPTextField
 									label="Email"
 									name="recipientEmail"
 									fullWidth
 									size="small"
-									onBlur={handleRecipientEmail}
-									inputProps={{
-										endAdornment: (
-											<InputAdornment position="end">
-												<IconButton edge="end" style={{ color: 'red' }} onClick={handleRecipientEmailRemoveClick}>
-													<RemoveCircleIcon />
-												</IconButton>
-											</InputAdornment>
-										)
-									}}
-									//handleChange={handleRecipientEmail}
-									//	error={clientForm.errors.recipientEmail ? true : false}
-									//	helperText={clientForm.errors.recipientEmail ? clientForm.errors.recipientEmail : ''}
+									onBlur={clientForm.handleBlur}
+									handleChange={clientForm.handleChange}
+									value={clientForm.values.recipientEmail}
+									error={clientForm.errors.recipientEmail ? true : false}
+									helperText={clientForm.errors.recipientEmail ? clientForm.errors.recipientEmail : ''}
 								/>
 								<CPButton
 									label={<AddIcon />}
 									onClick={handleAdd}
 									variant="contained"
-									style={{ width: '48px', height: '48px', marginLeft: 10 }}
-									//	disabled={clientForm.errors.recipientEmail ? true : false}
+									style={{ minWidth: '40px', width: '40px', height: '40px', marginLeft: 10, flex: 'none' }}
+									disabled={
+										clientForm.errors.recipientEmail || (clientForm.values.recipientEmail?.length ?? 0) === 0
+											? true
+											: false
+									}
 								/>
-								<span style={{ marginLeft: 10 }}>add more</span>
+								<span style={{ marginLeft: 10, height: '40px', display: 'flex', flex: 'none', alignItems: 'center' }}>
+									add more
+								</span>
 							</Grid>
 						</Grid>
 						<Grid item xs={12}>
@@ -377,9 +380,14 @@ const Clients: NextPage = () => {
 						handleClose={handleClose}
 						actions={
 							<>
-								<Button onClick={handleSave} variant="contained">
-									Create Client
-								</Button>
+								<CPLoadingButton
+									label={'Create user'}
+									variant="contained"
+									style={{ padding: '8px 32px' }}
+									onClick={clientForm.submitForm}
+									disabled={!(clientForm.isValid && clientForm.dirty)}
+									loading={isCreatingClient}
+								/>
 							</>
 						}
 					/>
@@ -430,15 +438,5 @@ const Clients: NextPage = () => {
 		</div>
 	);
 };
-
-// export const getServerSideProps: GetServerSideProps = async (context) => {
-// 	// Fetch data from external API
-// 	const res = await fetch(`https://arcane-brook-87163.herokuapp.com/api/districts`);
-// 	console.log(res.data);
-// 	const data = await res.json();
-
-// 	// Pass data to the page via props
-// 	return { props: { data } };
-// };
 
 export default Clients;
