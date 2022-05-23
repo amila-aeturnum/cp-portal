@@ -85,9 +85,9 @@ const Clients: NextPage = () => {
 		//alert(JSON.stringify(data));
 	};
 
-	const handleDelete = async (data: IUserAccount) => {
+	const handleDelete = async (data: any) => {
 		try {
-			const response = await deleteEndpointPromise(`/entitymanager/client-account/delete?id=${data.id}`);
+			const response = await deleteEndpointPromise(`/entitymanager/user/delete?id=${data.id}`);
 			getAllClients();
 			enqueueSnackbar('Successfully Deleted', { variant: 'success' });
 		} catch (error) {
@@ -104,10 +104,9 @@ const Clients: NextPage = () => {
 	const handleDataExport = async () => {
 		try {
 			const response = await getEndpointPromise(`/entitymanager/client-account/download`);
-			fileDownload(response.data, 'clients.csv');
+			fileDownload(response.data, 'accounts.csv');
 		} catch (error) {
 			console.log(error);
-		} finally {
 		}
 	};
 
