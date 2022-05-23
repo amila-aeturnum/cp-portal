@@ -29,6 +29,7 @@ import { get } from 'lodash';
 import DataTable from 'components/molecules/DataTable';
 import { IColumn } from 'components/molecules/DataTable/DataTable.type';
 import { useMsal } from '@azure/msal-react';
+import fileDownload from 'js-file-download';
 
 interface IAccountForm {
 	fullName: string;
@@ -131,7 +132,7 @@ const Accounts: NextPage = () => {
 				)}`
 			);
 			setRowCount(get(response, 'data.pagination.total'));
-			setAccountsList(get(response, 'data.userAccountList'));
+			setAccountsList(get(response, 'data.userList'));
 		} catch (error) {
 			console.log(error);
 		} finally {
@@ -162,8 +163,13 @@ const Accounts: NextPage = () => {
 		setIsAnalyst(null);
 		setOpen(false);
 	};
-	const handleDataExport = () => {
-		alert('not implemented');
+	const handleDataExport = async () => {
+		try {
+			const response = await getEndpointPromise(`/entitymanager/user/download`);
+			fileDownload(response.data, 'clients.csv');
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	const createAccount = (client: IAccountForm) => {
@@ -171,6 +177,10 @@ const Accounts: NextPage = () => {
 		axiosInstance
 			.post(`${process.env.NEXT_PUBLIC_REACT_APP_BASE_API_URL}/entitymanager/user/create`, client)
 			.then(function (response) {
+				getAllAccounts();
+				enqueueSnackbar(
+					<CPAlert title={t('successful')} message={t('new_user_account_created')} severity={'success'} />
+				);
 				enqueueSnackbar(
 					<CPAlert title={t('successful')} message={t('new_user_account_created')} severity={'success'} />
 				);
