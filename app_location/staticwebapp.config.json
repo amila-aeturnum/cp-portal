@@ -1,0 +1,4 @@
+{
+	"route": "/blog/*",
+	"rewrite": "/blog/[pid].html"
+}
